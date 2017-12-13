@@ -51,3 +51,80 @@ Reference类共有两个构造函数，都表示构造一个指向`T`类型对�
 
 jvm不需要定义相应的状态值来判断引用处于哪个状态，而是通过计算`next`和`queue`进行判断。
 
+## Reference实现原理 ##
+
+当使用几种类型的Reference时，只要初始化了一个`Reference`对象`ref`，Reference内部的静态块代码就会创建并启动处理引用的线程`ReferenceHandler`就会自动运行，这是一个最高优先级的守护线程，此线程做的事就是一直运行处理`Pending`状态的引用，如果发现合适的引用则将其放入注册的引用队列。其实现如下：
+
+```java
+static boolean tryHandlePending(boolean waitForNotify) {
+    Reference<Object> r;
+    Cleaner c;
+    try {
+        synchronized (lock) {
+            if (pending != null) {// 如果有pending状态的引用
+                r = pending;// 拿到pending状态的引用
+                // 'instanceof' might throw OutOfMemoryError sometimes
+                // so do this before un-linking 'r' from the 'pending' chain...
+                c = r instanceof Cleaner ? (Cleaner) r : null;
+                // 将此引用从pending链断开
+                pending = r.discovered;
+                r.discovered = null;
+            } else {
+                // The waiting on the lock may cause an OutOfMemoryError
+                // because it may try to allocate exception objects.
+                if (waitForNotify) {
+                    lock.wait();
+                }
+                // retry if waited
+                return waitForNotify;
+            }
+        }
+    } catch (OutOfMemoryError x) {
+        // Give other threads CPU time so they hopefully drop some live references
+        // and GC reclaims some space.
+        // Also prevent CPU intensive spinning in case 'r instanceof Cleaner' above
+        // persistently throws OOME for some time...
+        Thread.yield();
+        // retry
+        return true;
+    } catch (InterruptedException x) {
+        // retry
+        return true;
+    }
+
+    // Fast path for cleaners
+    if (c != null) {
+        c.clean();
+        return true;
+    }
+	// 若注册了引用队列则放入其中，进入enqueued状态
+    ReferenceQueue<? super Object> q = r.queue;
+    if (q != ReferenceQueue.NULL) q.enqueue(r);
+    return true;
+}
+```
+其中的`discovered`,表示要处理的对象的下一个对象.即可以理解要处理的对象也是一个链表,通过discovered进行排队,这边只需要不停地拿到pending,然后再通过discovered不断地拿到下一个对象即可.因为这个pending对象,两个线程都可能访问,因此需要加锁处理.
+
+引用从pending状态到enqueued是通过`queue.enqueue(r)`操作，这是引用队列中的一个方法，只由Reference类调用，来看看里面都做了什么：
+
+```java
+boolean enqueue(Reference<? extends T> r) { /* Called only by Reference class */
+    synchronized (lock) {
+        // 获得锁之后检查引用是否已经被加入过或者已经被移除
+        ReferenceQueue<?> queue = r.queue;
+        if ((queue == NULL) || (queue == ENQUEUED)) {
+            return false;
+        }
+        assert queue == this;
+        r.queue = ENQUEUED;// 设置已入队状态
+        r.next = (head == null) ? r : head;//后进先出的队列，后进来的引用先被取出处理
+        head = r;
+        queueLength++;
+        if (r instanceof FinalReference) {
+            sun.misc.VM.addFinalRefCount(1);
+        }
+        lock.notifyAll();//发布通知可以从中取出引用处理了
+        return true;
+    }
+}
+```
