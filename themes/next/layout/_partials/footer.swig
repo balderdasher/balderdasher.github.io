@@ -51,11 +51,15 @@
         var isHidden = document.hidden;
         if (isHidden) {
             document.title = "爱我~别走〒_〒";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 3000);
+
         } else {
             document.title = "终于等到你~还好我没放弃.";
             setTimeout(function () {
                 document.title = oldTitle;
-            }, 500);
+            }, 2000);
         }
     })
 </script>
