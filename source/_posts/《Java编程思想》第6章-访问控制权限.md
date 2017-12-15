@@ -23,10 +23,10 @@ permalink: thinking-in-java-access-privilege
 
 四种访问控制权限之间的异同如下表所示：
 
-|权限|当前类|同包类|子类|其他类|
-|:---|:---|:---|:---|:---|
-|public|√|√|√|√|
-|protected|√|√|√||
-|default|√|√|||
-|private|√||||
+权限|当前类|同包类|子类|其他类
+:---|:---|:---|:---|:---
+public|√|√|√|√
+protected|√|√|√|
+default|√|√||
+private|√|||
 
