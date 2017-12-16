@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://balderdasher.github.io/2017/05/18/thinking-in-java-inner-class/</loc>
+    
+    <lastmod>2017-12-16T10:40:18.096Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://balderdasher.github.io/2017/05/17/thinking-in-java-interface/</loc>
     
     <lastmod>2017-12-15T14:18:11.458Z</lastmod>
