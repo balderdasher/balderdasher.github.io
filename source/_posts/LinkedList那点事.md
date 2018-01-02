@@ -5,7 +5,7 @@ tags: [java,集合]
 categories: java
 permalink: things-about-linkedlist
 ---
-![LinkedList继承结构](uploads/notes/LinkedList.png)
+![LinkedList继承结构](/uploads/notes/LinkedList.png)
 
 <!--more-->
 
