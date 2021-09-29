@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,集合,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="男猿北蛰" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="keywords" content="java,集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HashMap那点事">
+<meta property="og:url" content="https://balderdasher.github.io/2018/01/03/things-about-hashmap/index.html">
+<meta property="og:site_name" content="男猿北蛰">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://balderdasher.github.io/uploads/notes/HashMap.png">
+<meta property="og:image" content="https://balderdasher.github.io/uploads/notes/HashMap-data-structure.jpg">
+<meta property="og:updated_time" content="2021-09-29T06:04:29.564Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HashMap那点事">
+<meta name="twitter:image" content="https://balderdasher.github.io/uploads/notes/HashMap.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://balderdasher.github.io/2018/01/03/things-about-hashmap/">
+
+
+
+
+
+  <title>HashMap那点事 | 男猿北蛰</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">男猿北蛰</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">CodePorter's Blog</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://balderdasher.github.io/2018/01/03/things-about-hashmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Code Porter">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/codeporter.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="男猿北蛰">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HashMap那点事</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-03T15:52:57+08:00">
+                2018-01-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,017 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/uploads/notes/HashMap.png" alt="HashMap继承机构"><br><a id="more"></a></p>
+<p>HashMap是基于哈希表的 <code>Map</code> 接口的实现。此实现提供所有可选的映射操作，并允许使用 null 值和 null 键。（除了非同步和允许使用 null 之外，HashMap 类与 Hashtable 大致相同。）此类不保证映射的顺序，特别是它不保证该顺序恒久不变。</p>
+<h2 id="HashMap的数据结构是什么？"><a href="#HashMap的数据结构是什么？" class="headerlink" title="HashMap的数据结构是什么？"></a>HashMap的数据结构是什么？</h2><p>HashMap底层是<em>链表散列</em>的数据结构，即数组和链表的结合体，底层是一个存放<code>Entry</code>的数组，<code>Entry</code>又可能是链表中的一个结点，其定义如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * The table, resized as necessary. Length MUST Always be a power of two. </span></span><br><span class="line"><span class="comment"> */</span>  </span><br><span class="line"><span class="keyword">transient</span> Entry[] table;  </span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;  </span><br><span class="line">    <span class="keyword">final</span> K key;  </span><br><span class="line">    V value;  </span><br><span class="line">    Entry&lt;K,V&gt; next;  </span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> hash;  </span><br><span class="line">    ……  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><img src="/uploads/notes/HashMap-data-structure.jpg" alt="HashMap数据结构"></p>
+<h2 id="影响HashMap性能的参数是什么？"><a href="#影响HashMap性能的参数是什么？" class="headerlink" title="影响HashMap性能的参数是什么？"></a>影响HashMap性能的参数是什么？</h2><p><code>HashMap</code> 的实例有两个参数影响其性能：<em>初始容量</em> 和<em>加载因子</em>。<strong>容量</strong> 是哈希表中桶的数量(数组的长度)，初始容量只是哈希表在创建时的容量。<em>加载因子</em> 是哈希表在其容量自动增加（扩容）之前可以达到多满的一种尺度。当哈希表中的条目数超出了<strong>加载因子与当前容量的乘积</strong>时，则要对该哈希表进行 <code>rehash</code>(扩容) 操作（即重建内部数据结构），从而哈希表将具有大约两倍的桶数。</p>
+<h2 id="HashMap的容量为什么一定要是2的次幂？"><a href="#HashMap的容量为什么一定要是2的次幂？" class="headerlink" title="HashMap的容量为什么一定要是2的次幂？"></a>HashMap的容量为什么一定要是2的次幂？</h2><p>HashMap的容量即底层数组的长度<code>length</code>,<code>length</code>将被用于计算元素将被放入数组的位置，计算方法如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">indexFor</span><span class="params">(<span class="keyword">int</span> h, <span class="keyword">int</span> length)</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> h &amp; (length-<span class="number">1</span>);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>取模运算<code>h % length</code>确保元素的分布相对是比较均匀的，当<code>length</code>是2的次幂时，<code>h &amp; (length-1)</code>运算等价于取模运算<code>h % length</code>，但是<code>&amp;</code>（与）运算比<code>%</code>（取模）运算具有更高的效率。同时，当length为2的次幂时，通过计算可以是元素获得更均匀的分布。</p>
+<p>假设数组长度为15和16，重新计算后的hash分别为8和9，那么通过<code>indexFor</code>散列之后的元素分布结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>table.length</th>
+<th>h &amp; (table.length-1)</th>
+<th>hash</th>
+<th>table.length-1</th>
+<th>index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15</td>
+<td>8 &amp; (15-1)</td>
+<td>1000</td>
+<td>1110</td>
+<td>1000(8)</td>
+</tr>
+<tr>
+<td>15</td>
+<td>9 &amp; (15-1)</td>
+<td>1001</td>
+<td>1110</td>
+<td>1000(8)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>8 &amp; (16-1)</td>
+<td>1000</td>
+<td>1111</td>
+<td>1000(8)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>9 &amp; (16-1)</td>
+<td>1001</td>
+<td>1111</td>
+<td>1001(9)</td>
+</tr>
+</tbody>
+</table>
+<p>从上表中可以看出，当length等于15时，不同的hash值8和9都被定位到了数组中的同一个位置8，产生了碰撞，而且此时的运算结果最后一位永远是0，所以0001，,011,1001,1011，0111,1101等位置将永远都不能存放元素了，空间浪费很大，也进一步增加了碰撞的几率，降低了查询效率。</p>
+<p>相反，当数组长度为16时，参与运算的length-1的二进制数每个位的值都为1，使得在低位与时，得到的值和原hash的低位相同，因此不同的hash值8和9被定位到了不同的位置上。因此当数组长度为2的次幂时，不同的key被定位到相同index的几率较小，数据在数组上的分布比较均匀，使得HashMap的查询效率得以提高。</p>
+<h2 id="如何处理大量的hash碰撞攻击？"><a href="#如何处理大量的hash碰撞攻击？" class="headerlink" title="如何处理大量的hash碰撞攻击？"></a>如何处理大量的hash碰撞攻击？</h2><p>此种攻击最常见的是POST数据攻击，构造一个含有大量碰撞key的post请求达到攻击的目的。</p>
+<ul>
+<li>控制post数据的大小</li>
+<li>限制http请求body的大小和参数的数量</li>
+<li>限制每个桶链表的最大长度</li>
+<li>使用其它数据结构如红黑树取代链表组织碰撞哈希（并不解决哈希碰撞，只是减轻攻击影响，将N个数据的操作时间从O(N^2)降至O(NlogN)，代价是普通情况下接近O(1)的操作均变为O(logN)）</li>
+</ul>
+<h2 id="jdk8中HashMap实现有什么变化"><a href="#jdk8中HashMap实现有什么变化" class="headerlink" title="jdk8中HashMap实现有什么变化"></a>jdk8中HashMap实现有什么变化</h2><p>jdk8中<code>HashMap</code>实现的底层结构有所变化，当桶上的链表长度大于8时，链表将转变为红黑树结构，一定程度上减轻了hash碰撞攻击的影响，优化了元素的查找效率。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="Code Porter 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Code Porter
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://balderdasher.github.io/2018/01/03/things-about-hashmap/" title="HashMap那点事">https://balderdasher.github.io/2018/01/03/things-about-hashmap/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          
+            <a href="/tags/集合/" rel="tag"><i class="fa fa-tag"></i> 集合</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/29/things-about-linkedlist/" rel="next" title="LinkedList那点事">
+                <i class="fa fa-chevron-left"></i> LinkedList那点事
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/06/algorithm-fundamentals-base-program-model/" rel="prev" title="算法第一章-算法基础之基础编程模型">
+                算法第一章-算法基础之基础编程模型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMjQ2OS85MDMw"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/codeporter.jpg" alt="Code Porter">
+            
+              <p class="site-author-name" itemprop="name">Code Porter</p>
+              <p class="site-description motion-element" itemprop="description">男猿，北蛰</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/balderdasher" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:balderdasher@msn.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap的数据结构是什么？"><span class="nav-number">1.</span> <span class="nav-text">HashMap的数据结构是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#影响HashMap性能的参数是什么？"><span class="nav-number">2.</span> <span class="nav-text">影响HashMap性能的参数是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap的容量为什么一定要是2的次幂？"><span class="nav-number">3.</span> <span class="nav-text">HashMap的容量为什么一定要是2的次幂？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何处理大量的hash碰撞攻击？"><span class="nav-number">4.</span> <span class="nav-text">如何处理大量的hash碰撞攻击？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jdk8中HashMap实现有什么变化"><span class="nav-number">5.</span> <span class="nav-text">jdk8中HashMap实现有什么变化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Code Porter</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">67.9k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.3</div>
+
+
+
+<script>
+    var oldTitle = document.title;
+    document.addEventListener("visibilitychange", function () {
+        var isHidden = document.hidden;
+        if (isHidden) {
+            document.title = "爱我~别走〒_〒";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 3000);
+
+        } else {
+            document.title = "终于等到你~还好我没放弃.";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 2000);
+        }
+    })
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

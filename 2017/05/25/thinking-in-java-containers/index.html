@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,读书笔记,容器,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="男猿北蛰" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="keywords" content="java,读书笔记,容器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Java编程思想》第17章-容器深入研究">
+<meta property="og:url" content="https://balderdasher.github.io/2017/05/25/thinking-in-java-containers/index.html">
+<meta property="og:site_name" content="男猿北蛰">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://balderdasher.github.io/uploads/thinking-in-java/java-containers-list-set-queue.png">
+<meta property="og:image" content="https://balderdasher.github.io/uploads/thinking-in-java/java-containers-map.png">
+<meta property="og:image" content="http://i.imgur.com/bY03QpW.png">
+<meta property="og:updated_time" content="2021-09-29T06:04:29.569Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Java编程思想》第17章-容器深入研究">
+<meta name="twitter:image" content="https://balderdasher.github.io/uploads/thinking-in-java/java-containers-list-set-queue.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://balderdasher.github.io/2017/05/25/thinking-in-java-containers/">
+
+
+
+
+
+  <title>《Java编程思想》第17章-容器深入研究 | 男猿北蛰</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">男猿北蛰</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">CodePorter's Blog</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://balderdasher.github.io/2017/05/25/thinking-in-java-containers/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Code Porter">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/codeporter.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="男猿北蛰">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Java编程思想》第17章-容器深入研究</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-25T11:29:50+08:00">
+                2017-05-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,430 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  19 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/uploads/thinking-in-java/java-containers-list-set-queue.png" alt="list-set-queue"><br><a id="more"></a><br><img src="/uploads/thinking-in-java/java-containers-map.png" alt="java-map"></p>
+<h2 id="深入研究容器的意义"><a href="#深入研究容器的意义" class="headerlink" title="深入研究容器的意义"></a>深入研究容器的意义</h2><ul>
+<li>学习散列机制是如何工作的</li>
+<li>在使用散列容器时怎样编写<code>hashCode()</code>和<code>equals()</code>方法</li>
+<li>为什么某些容器有不同版本的实现以及如何选择它们</li>
+</ul>
+<!--more-->
+<h2 id="17-1-完整的容器分类法"><a href="#17-1-完整的容器分类法" class="headerlink" title="17.1 完整的容器分类法"></a>17.1 完整的容器分类法</h2><p>完整的容器图<br><img src="http://i.imgur.com/bY03QpW.png" alt="full"></p>
+<h2 id="17-2-填充容器"><a href="#17-2-填充容器" class="headerlink" title="17.2 填充容器"></a>17.2 填充容器</h2><p>Collections容器工具类中的填充方法</p>
+<ul>
+<li><code>Collections.nCopies()</code></li>
+<li><code>Collections.fill()</code></li>
+</ul>
+<p>以上两种填充方式都只是复制一个对象引用来填充整个容器，并且只对<code>List</code>对象有用。</p>
+<h2 id="17-3-散列与散列码"><a href="#17-3-散列与散列码" class="headerlink" title="17.3 散列与散列码"></a>17.3 散列与散列码</h2><p>正确的<code>equals()</code>方法必须满足一下5个条件：</p>
+<ol>
+<li>自反性：对任意<code>x</code>,<code>x.equals(x)</code>一定返回true</li>
+<li>对称性：对任意<code>x</code>和<code>y</code>，如果<code>y.equals(x)</code>返回true，则<code>x.equals(y)</code>也返回true</li>
+<li>传递性：对任意<code>x</code>、<code>y</code>、<code>z</code>，如果有<code>x.equals(y)</code>返回true，<code>y.equals(z)</code>返回true，则<code>x.equals(z)</code>一定返回true</li>
+<li>一致性：对任意<code>x</code>和<code>y</code>，如果对象中用于等价比较的信息没有改变，那么无论调用<code>x.equals(y)</code>多少次，返回的结果应该保持一致，要么一直是true，要么一直是false</li>
+<li>对任何不是<code>null</code>的<code>x</code>，<code>x.equals(null)</code>一定返回false</li>
+</ol>
+<p><strong>默认的<code>Object.equals()</code>只是比较对象的地址</strong>，所以一个<code>Stu</code>并不等于另一个<code>Stu</code>。</p>
+<h3 id="17-3-1-理解hashCode"><a href="#17-3-1-理解hashCode" class="headerlink" title="17.3.1 理解hashCode()"></a>17.3.1 理解hashCode()</h3><p>首先，使用散列的目的在于：想要使用一个对象来查找另一个对象，下面是一个使用一对<code>ArrayList</code>实现的<code>Map</code>，包含了Map接口的完整实现，因此提供了<code>entrySet()</code>方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SlowMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;K&gt; keys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> List&lt;V&gt; values = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        V oldValue = get(key);</span><br><span class="line">        <span class="keyword">if</span> (!keys.contains(key))&#123;</span><br><span class="line">            keys.add(key);</span><br><span class="line">            values.add(value);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            values.set(keys.indexOf(key),value);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> oldValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!keys.contains(key))&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> values.get(keys.indexOf(key));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Set&lt;Map.Entry&lt;K, V&gt;&gt; entrySet() &#123;</span><br><span class="line">        Set&lt;Map.Entry&lt;K,V&gt;&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        Iterator&lt;K&gt; ki = keys.iterator();</span><br><span class="line">        Iterator&lt;V&gt; vi = values.iterator();</span><br><span class="line">        <span class="keyword">while</span> (ki.hasNext())&#123;</span><br><span class="line">            set.add(<span class="keyword">new</span> MapEntry&lt;K, V&gt;(ki.next(),vi.next()));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> set;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MapEntry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> K key;</span><br><span class="line">        <span class="keyword">private</span> V value;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MapEntry</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.value = value;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> K <span class="title">getKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> key;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> V <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> value;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> V <span class="title">setValue</span><span class="params">(V v)</span> </span>&#123;</span><br><span class="line">            V result = v;</span><br><span class="line">            value = v;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> (key == <span class="keyword">null</span> ? <span class="number">0</span> : key.hashCode())^</span><br><span class="line">                    (value == <span class="keyword">null</span> ? <span class="number">0</span> : value.hashCode());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (!(obj <span class="keyword">instanceof</span> MapEntry))&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            MapEntry me = (MapEntry) obj;</span><br><span class="line">            <span class="keyword">return</span> (key == <span class="keyword">null</span>?me.getKey() == <span class="keyword">null</span>:key.equals(me.getKey()))</span><br><span class="line">                    &amp;&amp; (value == <span class="keyword">null</span>?me.getValue() == <span class="keyword">null</span>:value.equals(me.getValue()));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> key + <span class="string">"="</span> + value;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SlowMap&lt;String,String&gt; map = <span class="keyword">new</span> SlowMap&lt;&gt;();</span><br><span class="line">        map.put(<span class="string">"a"</span>,<span class="string">"a"</span>);</span><br><span class="line">        map.put(<span class="string">"b"</span>,<span class="string">"b"</span>);</span><br><span class="line">        System.out.println(map);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SlowMap说明创建一个新的Map并不难，但是正如其名字所示，它并不快，问题在于对键的查询，键没有按照任何特定顺序保存，所以只能使用简单的线性查询，而线性查询是最慢的查询方式。</p>
+<p>散列的价值在于速度：散列使得查询得以快速进行，由于瓶颈位于键的查询速度，因此解决方案之一就是保持键的顺序状态，然后使用<code>Collection.binarySearch()</code>进行查询。</p>
+<p>散列则更进一步，它将键保存在某处，以便能够快速找到。存储一组元素最快的数据结构是数组，所以使用数组来表示键的信息（键的信息，不是键本身），但是因为数组不能够扩容，因此就有一个问题：我们希望在Map中保存数量不确定的值，但是如果键的数量被数组容量限制了又该怎么办呢？</p>
+<p>答案就是：数组并不保存键本身。而是通过键对象生成一个数字，将其作为数组的下标。这个数字就是<strong>散列码</strong>，由散列函数<code>hashCode()</code>生成。</p>
+<p>所以可以说：<strong>散列码就是在Map中的键对象在其保存键信息的数组中的下标数字</strong>。</p>
+<p>为解决数组容量被固定的问题，不同的键可以产生相同的下标，也就是说，散列码可能会有<em>冲突</em>。因此，数组多大已经不重要了，任何键总能在数组中找到它的位置。</p>
+<p>于是，在map中查询一个值的过程首先就是计算散列码，然后使用散列码查询数组，如果能够保证没有冲突（只有值的数量是固定时才有可能），那就可以有一个<em>完美的散列函数</em>，但是这种情况只是特例（EnumMap和EnumSet中得到了实现）。通常，冲突由外部连接处理：数组并不直接保存值，而是保存值的<code>list</code>。然后对list中的值使用<code>equals()</code>方法进行线性的查询。这部分的查询会比较慢，但是如果散列函数好的话，数组的每个位置就只有较少的值，因此不是查询整个list，而是快速地跳到数组的某个位置，只对很少的元素进行比较。这就是<code>HashMap</code>会如此快的原因。</p>
+<p>根据以上关于散列的原理，就可以实现如下一个简单的散列Map了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleHashMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 指定一个质数作为哈希表的长度，用于获得均匀分布</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SIZE = <span class="number">997</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用于存放值list的数组，即散列表</span></span><br><span class="line">    LinkedList&lt;MapEntry&lt;K,V&gt;&gt;[] buckets = <span class="keyword">new</span> LinkedList[SIZE];</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        V oldValue = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">// 计算该值要存放在数组中的哪个位置</span></span><br><span class="line">        <span class="keyword">int</span> index = Math.abs(key.hashCode()) % SIZE;</span><br><span class="line">        <span class="comment">// 该位置可用则在此位置初始化存储空间</span></span><br><span class="line">        <span class="keyword">if</span> (buckets[index] == <span class="keyword">null</span>)&#123;</span><br><span class="line">            buckets[index] = <span class="keyword">new</span> LinkedList&lt;MapEntry&lt;K,V&gt;&gt;();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 待放入的bucket</span></span><br><span class="line">        LinkedList&lt;MapEntry&lt;K,V&gt;&gt; bucket = buckets[index];</span><br><span class="line">        <span class="comment">// 构造键值对</span></span><br><span class="line">        MapEntry&lt;K,V&gt; pair = <span class="keyword">new</span> MapEntry&lt;&gt;(key,value);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> found = <span class="keyword">false</span>;</span><br><span class="line">        <span class="comment">// 在数组中对应下标的list中查找key，若存在相同的key则替换旧值</span></span><br><span class="line">        ListIterator&lt;MapEntry&lt;K,V&gt;&gt; it = bucket.listIterator();</span><br><span class="line">        <span class="keyword">while</span> (it.hasNext())&#123;</span><br><span class="line">            MapEntry&lt;K,V&gt; iPair = it.next();</span><br><span class="line">            <span class="keyword">if</span> (iPair.getKey().equals(key))&#123;</span><br><span class="line">                oldValue = iPair.getValue();</span><br><span class="line">                it.set(pair); <span class="comment">// 替换旧值</span></span><br><span class="line">                found = <span class="keyword">true</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 未查到key则在数组相应位置中的list中放入此键值对</span></span><br><span class="line">        <span class="keyword">if</span> (!found)&#123;</span><br><span class="line">            buckets[index].add(pair);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> oldValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 先根据key确定在数组中定位查询范围</span></span><br><span class="line">        <span class="keyword">int</span> index = Math.abs(key.hashCode()) % SIZE;</span><br><span class="line">        <span class="keyword">if</span> (buckets[index] == <span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 在确定的查询范围中根据key查询查到则返回值</span></span><br><span class="line">        <span class="keyword">for</span> (MapEntry&lt;K,V&gt; iPair:buckets[index])&#123;</span><br><span class="line">            <span class="keyword">if</span> (iPair.getKey().equals(key))&#123;</span><br><span class="line">                <span class="keyword">return</span> iPair.getValue();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Set&lt;Entry&lt;K, V&gt;&gt; entrySet() &#123;</span><br><span class="line">        Set&lt;Entry&lt;K,V&gt;&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (LinkedList&lt;MapEntry&lt;K,V&gt;&gt; bucket : buckets)&#123;</span><br><span class="line">            <span class="keyword">if</span> (bucket == <span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (MapEntry&lt;K,V&gt; mpair : bucket)&#123;</span><br><span class="line">                set.add(mpair);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> set;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SimpleHashMap&lt;String,String&gt; m = <span class="keyword">new</span> SimpleHashMap&lt;&gt;();</span><br><span class="line">        m.put(<span class="string">"a"</span>,<span class="string">"a"</span>);</span><br><span class="line">        m.put(<span class="string">"b"</span>,<span class="string">"b"</span>);</span><br><span class="line">        System.out.println(m);</span><br><span class="line">        System.out.println(m.get(<span class="string">"a"</span>));</span><br><span class="line">        System.out.println(m.entrySet());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;a=a, b=b&#125;</span><br><span class="line">a</span><br><span class="line">[a=a, b=b]</span><br></pre></td></tr></table></figure></p>
+<h3 id="17-3-2-覆盖hashCode"><a href="#17-3-2-覆盖hashCode" class="headerlink" title="17.3.2 覆盖hashCode()"></a>17.3.2 覆盖hashCode()</h3><p>理解了散列的原理之后，编写自己的hashCode()就更有意义了，</p>
+<p>设计hashCode()时最重要的因素就是：无论何时，对同一个对象调用hashCode()都应该生成同样的值。如果put时和get时产生的hashCode()值不一样，那就无法重新取得对象了，所以如果hashCode()方法依赖于对象中易变的数据，那么当此数据发生变化时，使用hashCode()将会产生不一样的散列码，相当于产生了一个不同的键。</p>
+<p>另外，也不应该使hashCode()依赖于具有唯一性的对象信息，尤其是使用<code>this</code>的值，这只能产生很糟糕的hashCode(),因为这样做无法生成一个新的键，使之与put时原始的键值相同（因为每个对象的地址虽然是唯一的但是它们也不同所以不会产生相同的键）。</p>
+<p>以<code>String</code>类为例，<code>String</code>有个特点：如果程序中有多个String对象，都包含相同的字符串序列，那么这些String对象都映射到同一块内存区域。所以<code>new String（“hello”）</code>生成的两个实例虽然是相互独立的，但是对它们使用hashCode()应该生成同样的结果，如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StringHashCode</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] hellos = <span class="string">"Hello Hello"</span>.split(<span class="string">" "</span>);</span><br><span class="line">        System.out.println(hellos[<span class="number">0</span>].hashCode());</span><br><span class="line">        System.out.println(hellos[<span class="number">1</span>].hashCode());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">69609650</span><br><span class="line">69609650</span><br></pre></td></tr></table></figure></p>
+<p>所以对于String而言，hashCode()明显是基于内容的，因此，想要hashCode()实用，它必须速度快而且有意义，也就是说它必须基于对象的内容生成散列码，要记住散列码不必是独一无二的（因为散列码只决定该对象放于哪个桶中，而该桶中可以放多个对象，所以散列码相同无所谓），应该更关注速度而不是唯一性，但前提是通过hashCode()和equals(),必须能够完全确定对象的身份。</p>
+<p>另一个因素就是：好的<code>hashCode()</code>应该产生分布均匀的散列码，不难想象，如果散列码都集中在一块，那么<code>HashMap</code>在某些区域的负载会很重，这样就不如分不均与的散列码快（负载重的话put和get操作时对key的线性查询范围增大所以速度就慢了）。</p>
+<p>Joshua Bloch在他的<code>Effective Java</code>丛书中给出了如何写出一个好的<code>hashCode()</code>的指导：</p>
+<p>1) 给<code>int</code>变量<code>result</code>赋予某个非零值常量，如<code>17</code>。<br>2) 为对象内部每个有意义的域<code>f</code>（即每个可以做<code>equals()</code>操作的域）计算出一个<code>int散列码</code><strong>c</strong>。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">域类型</th>
+<th style="text-align:left">计算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">boolean</td>
+<td style="text-align:left">c=(f?0:1)</td>
+</tr>
+<tr>
+<td style="text-align:left">byte、char、short、int</td>
+<td style="text-align:left">c=(int)f</td>
+</tr>
+<tr>
+<td style="text-align:left">long</td>
+<td style="text-align:left">c=(int)(f^(f&gt;&gt;&gt;32))</td>
+</tr>
+<tr>
+<td style="text-align:left">float</td>
+<td style="text-align:left">c=(int)Float.floatToIntBits(f)</td>
+</tr>
+<tr>
+<td style="text-align:left">double</td>
+<td style="text-align:left">long l = Double.doubleToLongBits(f);c=(int)(l^(l&gt;&gt;&gt;32))</td>
+</tr>
+<tr>
+<td style="text-align:left">Object，其equals()调用这个域的equals()</td>
+<td style="text-align:left">c=f.hashCode()</td>
+</tr>
+<tr>
+<td style="text-align:left">数组</td>
+<td style="text-align:left">对每个元素应用上述规则</td>
+</tr>
+</tbody>
+</table>
+<p>3) 合并计算得到的散列码：<code>result = 37 * result + c</code>;<br>4) 返回<code>result</code><br>5) 检查hashCode()最后生成的结果，确保相同的对象有相同的散列码。</p>
+<p>以下是一个以上述规则为指导的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 遵循指导的一个hashCode()实现</span></span><br><span class="line"><span class="comment"> * Created by balderdasher on 2016/7/13.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CountedString</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> List&lt;String&gt; created = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> String s;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CountedString</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.s = s;</span><br><span class="line">        created.add(s);</span><br><span class="line">        <span class="comment">// id 为此String在CountedString中使用的实例总数</span></span><br><span class="line">        <span class="keyword">for</span> (String s1 : created) &#123;</span><br><span class="line">            <span class="keyword">if</span> (s1.equals(s)) &#123;</span><br><span class="line">                id++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"String："</span> + s + <span class="string">" id："</span> + id + <span class="string">" hashCode()："</span> + hashCode();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="number">17</span>;</span><br><span class="line">        result = <span class="number">37</span> * result + s.hashCode();</span><br><span class="line">        result = <span class="number">37</span> * result + id;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> obj <span class="keyword">instanceof</span> CountedString &amp;&amp;</span><br><span class="line">                s.equals(((CountedString) obj).s) &amp;&amp;</span><br><span class="line">                id == ((CountedString) obj).id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Map&lt;CountedString,Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        CountedString[] cs = <span class="keyword">new</span> CountedString[<span class="number">5</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; cs.length; i++) &#123;</span><br><span class="line">            cs[i] = <span class="keyword">new</span> CountedString(<span class="string">"hi"</span>);</span><br><span class="line">            map.put(cs[i],i);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(map);</span><br><span class="line">        <span class="keyword">for</span> (CountedString cstring:cs)&#123;</span><br><span class="line">            System.out.println(<span class="string">"Looking up "</span> + cstring);</span><br><span class="line">            System.out.println(map.get(cstring));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;String：hi id：4 hashCode()：146450=3, String：hi id：5 hashCode()：146451=4, String：hi id：2 hashCode()：146448=1, String：hi id：3 hashCode()：146449=2, String：hi id：1 hashCode()：146447=0&#125;</span><br><span class="line">Looking up String：hi id：1 hashCode()：146447</span><br><span class="line">0</span><br><span class="line">Looking up String：hi id：2 hashCode()：146448</span><br><span class="line">1</span><br><span class="line">Looking up String：hi id：3 hashCode()：146449</span><br><span class="line">2</span><br><span class="line">Looking up String：hi id：4 hashCode()：146450</span><br><span class="line">3</span><br><span class="line">Looking up String：hi id：5 hashCode()：146451</span><br><span class="line">4</span><br></pre></td></tr></table></figure></p>
+<h2 id="17-4-选择接口的不同实现"><a href="#17-4-选择接口的不同实现" class="headerlink" title="17.4 选择接口的不同实现"></a>17.4 选择接口的不同实现</h2><p>尽管实际上只有四中容器：<code>Map</code>、<code>List</code>、<code>Set</code>和<code>Queue</code>，但是每种接口都有各种实现版本，我们在实际使用时应该如何选择呢？</p>
+<p>容器之间的区别可以归结为在它们背后有什么样的数据结构支持，即所用的接口是由什么数据结构实现的，如<code>ArrayList</code>底层由数组支持，而<code>LinkedList</code>是由双向链表实现，每个对象包含数据的同时还包含指向链表中前一个和后一个元素的引用，因此如果要经常插入或删除元素，LinkedList就比较合适，否则应该用速度更快的ArrayList。</p>
+<h3 id="17-4-1-对List的选择"><a href="#17-4-1-对List的选择" class="headerlink" title="17.4.1 对List的选择"></a>17.4.1 对List的选择</h3><p>通过性能测试可以得出结论：</p>
+<ul>
+<li><strong>查询：</strong>对于背后有数组支持的List和<code>ArrayList</code>，无论列表的大小如何，访问数据都是快速和一致的；而对于<code>LinkedList</code>，访问元素的时间对于较大的列表将明显增加，所以如果需要大量的随机访问，应该用<code>ArrayList</code>。</li>
+<li><strong>插入和删除：</strong>在列表中执行插入和删除操作时，对于<code>ArrayList</code>,当列表变大时，其开销将变得很大，但是对于<code>LinkedList</code>来说开销相对低廉，并且不随列表尺寸而发生变化，这是因为ArrayList在插入或删除元素时，必须创建空间并将它的所有引用向前或后移动，所以ArrayList的尺寸越大，开销就越多。而LinkedList只需要链接新的元素不必修改列表中剩余的元素，所以无论LinkedList的尺寸如何变化，插入的开销都大致相同。</li>
+</ul>
+<h3 id="17-4-2-对Set的选择"><a href="#17-4-2-对Set的选择" class="headerlink" title="17.4.2 对Set的选择"></a>17.4.2 对Set的选择</h3><ul>
+<li><code>HashSet</code>的性能基本上总是比<code>TreeSet</code>好，特别是添加和查询元素时</li>
+<li><code>TreeSet</code>存在的唯一原因是因为它可以维持元素的排序状态，所以只有当需要一个排好序的Set时，才应该使用<code>TreeSet</code></li>
+<li>因为<code>TreeSet</code>的内部结构支持排序，并且因为迭代是更有可能的操作，所以用<code>TreeSet</code>迭代一般要比用<code>HashSet</code>快。</li>
+<li>对于插入操作，<code>LinkedHashSet</code>比<code>HashSet</code>的代价更高，这是由维护链表所带来的额外开销</li>
+</ul>
+<h3 id="17-4-3-对Map的选择"><a href="#17-4-3-对Map的选择" class="headerlink" title="17.4.3 对Map的选择"></a>17.4.3 对Map的选择</h3><ul>
+<li>除了<code>IdentityHashMap</code>，所有的Map实现的插入操作都会随着Map尺寸的变大而明显变慢</li>
+<li>HashMap 是Hashtable 的轻量级实现（非线程安全的实现），他们都完成了Map 接口，主要区别在于HashMap 允许空（null）键值（key）,由于非线程安全，效率上可能高于Hashtable。HashMap 允许将null 作为一个entry 的key 或者value，而Hashtable 不允许。HashMap 把Hashtable 的contains 方法去掉了，改containsvalue 和containsKey。因为contains方法容易让人引起误解。Hashtable 继承自Dictionary 类，而HashMap Java1.2 引进的Map interface 的一个实现。最大的不同是，Hashtable 的方法是Synchronize 的，而HashMap 不是，在多个线程访问Hashtable 时，不需要自己为它的方法实现同步，而HashMap 就必须为之提供外同步。Hashtable 和HashMap 采用的hash/rehash 算法都大概一样，所以性能不会有很大的差异。</li>
+<li><code>TreeMap</code>通常比<code>HashMap</code>要慢</li>
+<li><code>LinkedHashMap</code>在插入时比<code>HashMap</code>慢一点，因为它维护散列数据结构的同时还要维护链表（以保持插入顺序），但正因为有链表，所以迭代速度更快</li>
+<li><code>IdentityHashMap</code>具有完全不同的性能，因为它使用<code>==</code>而不是<code>equals()</code>来比较元素</li>
+</ul>
+<p><strong>HashMap的性能因子</strong></p>
+<p>hashMap中的几个术语解释：</p>
+<ul>
+<li>容量：表中的桶位数</li>
+<li>初始容量：表在创建时所拥有的桶位数，HashMap和HashSet允许指定初始容量的构造器。</li>
+<li>尺寸：表中当前存储的项数</li>
+<li>负载因子：尺寸/容量，空表的负载因子是0，半满表的则是0.5,以此类推，负载轻的表产生冲突的可能性小，因此对于插入和查找都是最理想的（但是迭代过程会慢），<code>HashMap</code>和<code>HashSet</code>都具有允许指定负载因子的构造器，表示当负载情况达到该负载因子的水平时，容器将自动增加其容量（桶位数），实现方式是使容量大致加倍，并将对象重新散列分布。</li>
+</ul>
+<h2 id="快速报错"><a href="#快速报错" class="headerlink" title="快速报错"></a>快速报错</h2><p>Java容器有一种保护机制，能够防止多个进程同事修改同一个容器的内容，如果在迭代遍历某个容器的过程中，另一个过程介入并且插入、删除或修改此容器内的某个对象，那么就会出现问题：<em>也许迭代过程已经处理过容器中的该元素了，也许还没处理，也许在调用<code>size()</code>之后容器的尺寸收缩了等等灾难情景</em>。Java容器类类库采用<strong>快速报错(fail-fast)</strong>机制。它会探查容器上的任何除了你的进程所进行的操作以外的所有变化，一旦发现其他进程修改了容器，就会立刻抛出<code>ConcurrentModificationException</code>异常。这就是“快速报错”的意思。</p>
+<p>快速报错机制的工作原理简单来讲就是：只需创建一个迭代器，然后向迭代器所指向的<code>Collection</code>添加点什么，这时候快速报错机制就起作用了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Java容器的快速失败机制</span></span><br><span class="line"><span class="comment"> * Created by mrdios on 2016/7/19.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FailFast</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Collection&lt;String&gt; c = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Iterator&lt;String&gt; it = c.iterator();</span><br><span class="line">        c.add(<span class="string">"bitch"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String s = it.next();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ConcurrentModificationException e) &#123;</span><br><span class="line">            System.out.println(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>output:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.util.ConcurrentModificationException</span><br></pre></td></tr></table></figure></p>
+<p>以上代码演示了快速报错机制的效果，这也提醒我们：<strong><font color="red">在使用Java容器时，应该在添加完所有元素之后，再获取迭代器</font></strong>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="Code Porter 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Code Porter
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://balderdasher.github.io/2017/05/25/thinking-in-java-containers/" title="《Java编程思想》第17章-容器深入研究">https://balderdasher.github.io/2017/05/25/thinking-in-java-containers/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          
+            <a href="/tags/读书笔记/" rel="tag"><i class="fa fa-tag"></i> 读书笔记</a>
+          
+            <a href="/tags/容器/" rel="tag"><i class="fa fa-tag"></i> 容器</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/24/thinking-in-java-array/" rel="next" title="《Java编程思想》第16章-数组">
+                <i class="fa fa-chevron-left"></i> 《Java编程思想》第16章-数组
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/31/thinking-in-java-io/" rel="prev" title="《Java编程思想》第18章-java io系统">
+                《Java编程思想》第18章-java io系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMjQ2OS85MDMw"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/codeporter.jpg" alt="Code Porter">
+            
+              <p class="site-author-name" itemprop="name">Code Porter</p>
+              <p class="site-description motion-element" itemprop="description">男猿，北蛰</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/balderdasher" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:balderdasher@msn.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#深入研究容器的意义"><span class="nav-number">1.</span> <span class="nav-text">深入研究容器的意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17-1-完整的容器分类法"><span class="nav-number">2.</span> <span class="nav-text">17.1 完整的容器分类法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17-2-填充容器"><span class="nav-number">3.</span> <span class="nav-text">17.2 填充容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17-3-散列与散列码"><span class="nav-number">4.</span> <span class="nav-text">17.3 散列与散列码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#17-3-1-理解hashCode"><span class="nav-number">4.1.</span> <span class="nav-text">17.3.1 理解hashCode()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#17-3-2-覆盖hashCode"><span class="nav-number">4.2.</span> <span class="nav-text">17.3.2 覆盖hashCode()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17-4-选择接口的不同实现"><span class="nav-number">5.</span> <span class="nav-text">17.4 选择接口的不同实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#17-4-1-对List的选择"><span class="nav-number">5.1.</span> <span class="nav-text">17.4.1 对List的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#17-4-2-对Set的选择"><span class="nav-number">5.2.</span> <span class="nav-text">17.4.2 对Set的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#17-4-3-对Map的选择"><span class="nav-number">5.3.</span> <span class="nav-text">17.4.3 对Map的选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速报错"><span class="nav-number">6.</span> <span class="nav-text">快速报错</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Code Porter</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">67.9k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.3</div>
+
+
+
+<script>
+    var oldTitle = document.title;
+    document.addEventListener("visibilitychange", function () {
+        var isHidden = document.hidden;
+        if (isHidden) {
+            document.title = "爱我~别走〒_〒";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 3000);
+
+        } else {
+            document.title = "终于等到你~还好我没放弃.";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 2000);
+        }
+    })
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

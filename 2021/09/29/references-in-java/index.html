@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="男猿北蛰" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="在jdk 1.2之前的Java中，若一个对象不被任何变量所引用，那么程序就无法在使用这个对象。也就是说只有对象只有在可触及状态（reachable）下才能被程序所使用。从jdk 1.2开始增加了java.lang.ref包，此包提供了引用对象类，支持在某种程度上与垃圾回收器之间的交互。程序可以使用一个引用对象来维持对另外某一对象的引用，所采用的方式是使后者仍然可以被回收器回收。程序还可以安排在回">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java中的引用Reference">
+<meta property="og:url" content="https://balderdasher.github.io/2021/09/29/references-in-java/index.html">
+<meta property="og:site_name" content="男猿北蛰">
+<meta property="og:description" content="在jdk 1.2之前的Java中，若一个对象不被任何变量所引用，那么程序就无法在使用这个对象。也就是说只有对象只有在可触及状态（reachable）下才能被程序所使用。从jdk 1.2开始增加了java.lang.ref包，此包提供了引用对象类，支持在某种程度上与垃圾回收器之间的交互。程序可以使用一个引用对象来维持对另外某一对象的引用，所采用的方式是使后者仍然可以被回收器回收。程序还可以安排在回">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-09-29T06:04:29.566Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java中的引用Reference">
+<meta name="twitter:description" content="在jdk 1.2之前的Java中，若一个对象不被任何变量所引用，那么程序就无法在使用这个对象。也就是说只有对象只有在可触及状态（reachable）下才能被程序所使用。从jdk 1.2开始增加了java.lang.ref包，此包提供了引用对象类，支持在某种程度上与垃圾回收器之间的交互。程序可以使用一个引用对象来维持对另外某一对象的引用，所采用的方式是使后者仍然可以被回收器回收。程序还可以安排在回">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://balderdasher.github.io/2021/09/29/references-in-java/">
+
+
+
+
+
+  <title>Java中的引用Reference | 男猿北蛰</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">男猿北蛰</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">CodePorter's Blog</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://balderdasher.github.io/2021/09/29/references-in-java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Code Porter">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/codeporter.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="男猿北蛰">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java中的引用Reference</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-29T14:04:29+08:00">
+                2021-09-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,282 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  16 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>在<code>jdk 1.2</code>之前的Java中，若一个对象不被任何变量所引用，那么程序就无法在使用这个对象。也就是说只有对象只有在<code>可触及状态（reachable）</code>下才能被程序所使用。从jdk 1.2开始增加了<code>java.lang.ref</code>包，此包提供了引用对象类，支持在某种程度上与垃圾回收器之间的交互。程序可以使用一个引用对象来维持对另外某一对象的引用，所采用的方式是使后者仍然可以被回收器回收。程序还可以安排在回收器确定某一给定对象的可到达性已经更改之后的某个时间得到通知。<br>在原来只有强引用的基础上新增了<code>软引用(SoftReference)</code>、<code>弱引用(WeakReference)</code>、<code>虚引用(PhantomReference)</code>3种对象引用类型。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="引用包规范"><a href="#引用包规范" class="headerlink" title="引用包规范"></a>引用包规范</h2><p><em>引用对象</em><code>Reference</code>封装了对另一个对象<code>T</code>的引用，这样就可以像其他任何对象一样检查和操作引用自身。有三种类型的引用对象，按从弱到强依次为： <em>软</em> 引用、 <em>弱</em> 引用和 <em>虚</em> 引用。正如下面定义的那样，每种类型对应于一个不同的可到达性级别。软引用适用于实现内存敏感的缓存，弱引用适用于实现无法防止其键（或值）被回收的规范化映射，而虚引用则适用于以某种比 Java 终结机制更灵活的方式调度 <code>pre-mortem</code> 清除操作。</p>
+<p>每种引用对象类型都是通过抽象的基本 <code>Reference</code> 类的一个子类实现的。其中一个子类的实例封装了对特定对象的引用，该对象名为指示对象。每个引用对象都提供了获取和清除该引用的方法。引用对象是不可变的，因此，除了清除操作之外，没有提供 set 操作。通过添加任何所需的字段和方法，程序可以为这些子类进一步创建子类，或者可以不加更改地使用这些子类。</p>
+<h3 id="通知"><a href="#通知" class="headerlink" title="通知"></a>通知</h3><p>在创建引用对象时，通过向 <em>引用队列</em> 注册 一个适当的引用对象，程序可以请求在对象可到达性更改时获得通知。在垃圾回收器确定引用的可到达性已经更改为对应于引用类型的值之后的某一时间，它会将引用添加到相关的队列中。此时，该引用被认为是 <em>已加入队列的</em>（<code>Enqueued</code>）。通过轮询或阻塞，直到获得了引用，程序才可以从队列中移除引用。引用队列是通过 <code>ReferenceQueue</code> 类实现的。</p>
+<p>已注册的引用对象及其队列之间的关系是单向的。也就是说，队列不会追踪那些向它注册的引用。如果一个已注册的引用本身变得不可到达，则永远不会将它加入到队列中。使用引用对象的程序的责任是，只要程序对其指示对象感兴趣，就要确保对象是可达到的。</p>
+<p>虽然某些程序会选择专门使用一个线程从一个或多个队列中移除引用对象并处理它们，但这是绝对没有必要的。一种通常很有用的策略是：在执行另一个相当频繁的操作期间检查引用队列。例如，使用弱引用来实现弱键的哈希表能在每次访问表时轮询其引用队列。这就是 <code>WeakHashMap</code> 类的工作方式。因为 <code>ReferenceQueue.poll()</code> 方法仅仅检查内部数据结构，此检查只为哈希表访问方法增加了很小的系统开销。</p>
+<h3 id="自动清除引用"><a href="#自动清除引用" class="headerlink" title="自动清除引用"></a>自动清除引用</h3><p>在将<em>软引用</em>和<em>弱引用</em>添加到向其注册的队列（如果有）之前，回收器将自动清除这些引用。所以，软引用和弱引用不需要向队列注册即可使用，而虚引用则需要这样做。通过虚引用可到达的对象将仍然保持原状，直到清除所有这类引用或者它们本身变得不可到达。</p>
+<h3 id="可到达性"><a href="#可到达性" class="headerlink" title="可到达性"></a>可到达性</h3><p>从最强到最弱，不同的可到达性级别反映了对象的生命周期。在操作上，可将它们定义如下：</p>
+<ul>
+<li>如果某一线程可以不必遍历所有引用对象而直接到达一个对象，则该对象是<em>强可到达</em> 对象。新创建的对象对于创建它的线程而言是强可到达对象。</li>
+<li>如果一个对象不是强可到达对象，但通过遍历某一软引用可以到达它，则该对象是<em>软可到达</em> 对象。</li>
+<li>如果一个对象既不是强可到达对象，也不是软可到达对象，但通过遍历弱引用可以到达它，则该对象是弱可到达 对象。当清除对某一弱可到达对象的弱引用时，便可以终止此对象了。</li>
+<li>如果一个对象既不是强可到达对象，也不是软可到达对象或弱可到达对象，它已经终止，并且某个虚引用在引用它，则该对象是<em>虚可到达</em> 对象。</li>
+<li>最后，当不能以上述任何方法到达某一对象时，该对象是<em>不可到达</em> 对象，因此可以回收此对象。</li>
+</ul>
+<h2 id="Reference类"><a href="#Reference类" class="headerlink" title="Reference类"></a>Reference类</h2><h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><blockquote>
+<p>泛型类<code>Reference</code>是几种新增引用类型的抽象基类，因为引用对象是通过与垃圾回收器的密切合作来实现的，所以不能直接为此类创建子类。</p>
+</blockquote>
+<p>以上是此类的API文档上说的，乍一看很是费解，怎么就不能直接为此类创建子类了，上面提到的几种引用不都是直接继承的它吗，这话到底是什么意思呢？</p>
+<p>其实<code>Reference</code>类不能直接创建子类的意思可以理解为我们在写代码的时候不能直接继承它，因为<code>Reference</code>的直接子类(软、弱、虚、final)都是由jvm定制化处理的，在代码中直接继承于它没有任何作用，只能继承或使用它的子类。</p>
+<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Reference(T referent) &#123;</span><br><span class="line">    <span class="keyword">this</span>(referent, <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Reference(T referent, ReferenceQueue&lt;? <span class="keyword">super</span> T&gt; queue) &#123;</span><br><span class="line">    <span class="keyword">this</span>.referent = referent;</span><br><span class="line">    <span class="keyword">this</span>.queue = (queue == <span class="keyword">null</span>) ? ReferenceQueue.NULL : queue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Reference类共有两个构造函数，都表示构造一个指向<code>T</code>类型对象的引用。其区别在于带不带<code>ReferenceQueue</code>类型的<code>queue</code>参数，带queue的意义在于我们可以在外部对这个queue进行监控，如果有对象即将被回收，那么相应的<code>Reference</code>对象就会被放入这个queue中，然后我们可以拿到引用对象做进一步的处理。</p>
+<p>构造函数中<code>T</code>类型的参数<code>referent</code>表示这个引用所指向的对象，这个对象即将被回收意味着此对象除了被指向它的<code>reference</code>引用之外没有其它引用了（并非真没有，而是gcRoot可达性分析之后确定为不可达，以避免循环引用问题）。</p>
+<p>构造函数中<code>ReferenceQueue</code>类型的<code>queue</code>参数即是<code>T</code>对象即被回收时所要通知的队列,当对象即被回收时,整个reference对象(而不是被回收的对象)会被放到queue里面,然后外部程序即可通过监控这个queue拿到相应的数据了。</p>
+<p>如果没有queue参数，就只有不断轮询Reference对象，通过判断里面的<code>get()</code>是否返回<code>null</code>（虚引用不能这么做，因为它的get始终返回null，因此它只有带queue的构造函数）来判断它所指向的对象是否被回收。这两种方法都有相应的使用场景，如<code>WeakHashMap</code>选择去查询queue来判断是否有对象将被回收，而<code>ThreadLocalMap</code>则采用判断<code>get()</code>是否为null来做处理。</p>
+<h3 id="辅助类ReferenceQueue"><a href="#辅助类ReferenceQueue" class="headerlink" title="辅助类ReferenceQueue"></a>辅助类ReferenceQueue</h3><p>引用队列<code>ReferenceQueue</code>类是使用几种引用时的辅助类，它的作用是在使用几种引用时方便监控我们所创建的引用的状态变化，如果构造一个指向<code>T</code>对象的引用时指定了一个引用队列，那么此队列将监控所有<code>T</code>类型对象的可达性状态变化，当gc决定此对象可达性改变时，相应的引用将会进入队列，我们可以从队列中取出此引用以便在对象回收之前做出处理。</p>
+<p>从名字上来看，<code>ReferenceQueue</code>似乎是一个队列，但其内部并没有实际的存储结构，它的存储是依赖<code>Reference</code>节点之间关系，因为Reference中的<code>next</code>字段存储了它的下一个节点，所以多个Reference形成了一个链表，ReferenceQueue可以看做是这个链表的容器，不过它只存储链表的头结点(<code>head</code>)。</p>
+<h3 id="Reference的状态"><a href="#Reference的状态" class="headerlink" title="Reference的状态"></a>Reference的状态</h3><p>每个引用对象都有自己相应的状态值，即描述自身及引用所指示对象<code>T</code>当前处于什么样的状态，方便进行查询、定位或处理。</p>
+<ul>
+<li><code>Active</code>：活动状态，即引用所指示的对象处于强引用状态，还没有被回收，此状态下引用对象不会被放入引用队列中（如果定义时注册了引用队列）,新创建的引用对象处于活动状态</li>
+<li><code>Pending</code>：等待状态，准备放入引用队列中，在此状态下要处理的引用对象将排队等到放入引用队列中，在这个时间窗口，相应的引用对象为pending状态，进入到此状态的任何reference可认为<code>next</code>为自身（jvm设置），创建时未注册引用队列的引用对象将永远不会是等待状态</li>
+<li><code>Enqueued</code>：进入状态，引用对象所指向的对象已经为等待回收，并且相应的引用对象已经放到引用队列中了，准备由外部线程来从queue中获取相应数据，此状态下，next为下一个要处理的对象，queue为特殊标识对象<code>ENQUEUED</code>，创建时未注册引用队列的引用对象将永远不可能是进入状态</li>
+<li><code>Inactive</code>：不活动状态，即此引用对象已经由外部从引用队列中获取到并且已经处理掉了，意味着此引用对象指向的对象T可以被回收，并且引用对象本身reference也可以被回收了，所以进入此状态的引用对象肯定是应该被回收掉的。一旦一个引用对象进入此状态，那么它的状态将不会再改变了。</li>
+</ul>
+<p>jvm不需要定义相应的状态值来判断引用处于哪个状态，而是通过计算<code>next</code>和<code>queue</code>进行判断。</p>
+<h2 id="Reference实现原理"><a href="#Reference实现原理" class="headerlink" title="Reference实现原理"></a>Reference实现原理</h2><p>当使用几种类型的Reference时，只要初始化了一个<code>Reference</code>对象<code>ref</code>，Reference内部的静态块代码就会创建并启动处理引用的线程<code>ReferenceHandler</code>就会自动运行，这是一个最高优先级的守护线程，此线程做的事就是一直运行处理<code>Pending</code>状态的引用，如果发现合适的引用则将其放入注册的引用队列。其实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">tryHandlePending</span><span class="params">(<span class="keyword">boolean</span> waitForNotify)</span> </span>&#123;</span><br><span class="line">    Reference&lt;Object&gt; r;</span><br><span class="line">    Cleaner c;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            <span class="keyword">if</span> (pending != <span class="keyword">null</span>) &#123;<span class="comment">// 如果有pending状态的引用</span></span><br><span class="line">                r = pending;<span class="comment">// 拿到pending状态的引用</span></span><br><span class="line">                <span class="comment">// 'instanceof' might throw OutOfMemoryError sometimes</span></span><br><span class="line">                <span class="comment">// so do this before un-linking 'r' from the 'pending' chain...</span></span><br><span class="line">                c = r <span class="keyword">instanceof</span> Cleaner ? (Cleaner) r : <span class="keyword">null</span>;</span><br><span class="line">                <span class="comment">// 将此引用从pending链断开</span></span><br><span class="line">                pending = r.discovered;</span><br><span class="line">                r.discovered = <span class="keyword">null</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// The waiting on the lock may cause an OutOfMemoryError</span></span><br><span class="line">                <span class="comment">// because it may try to allocate exception objects.</span></span><br><span class="line">                <span class="keyword">if</span> (waitForNotify) &#123;</span><br><span class="line">                    lock.wait();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// retry if waited</span></span><br><span class="line">                <span class="keyword">return</span> waitForNotify;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (OutOfMemoryError x) &#123;</span><br><span class="line">        <span class="comment">// Give other threads CPU time so they hopefully drop some live references</span></span><br><span class="line">        <span class="comment">// and GC reclaims some space.</span></span><br><span class="line">        <span class="comment">// Also prevent CPU intensive spinning in case 'r instanceof Cleaner' above</span></span><br><span class="line">        <span class="comment">// persistently throws OOME for some time...</span></span><br><span class="line">        Thread.yield();</span><br><span class="line">        <span class="comment">// retry</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException x) &#123;</span><br><span class="line">        <span class="comment">// retry</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Fast path for cleaners</span></span><br><span class="line">    <span class="keyword">if</span> (c != <span class="keyword">null</span>) &#123;</span><br><span class="line">        c.clean();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">// 若注册了引用队列则放入其中，进入enqueued状态</span></span><br><span class="line">    ReferenceQueue&lt;? <span class="keyword">super</span> Object&gt; q = r.queue;</span><br><span class="line">    <span class="keyword">if</span> (q != ReferenceQueue.NULL) q.enqueue(r);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中的<code>discovered</code>,表示要处理的对象的下一个对象.即可以理解要处理的对象也是一个链表,通过discovered进行排队,这边只需要不停地拿到pending,然后再通过discovered不断地拿到下一个对象即可.因为这个pending对象,两个线程都可能访问,因此需要加锁处理.</p>
+<p>引用从pending状态到enqueued是通过<code>queue.enqueue(r)</code>操作，这是引用队列中的一个方法，只由Reference类调用，来看看里面都做了什么：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">enqueue</span><span class="params">(Reference&lt;? extends T&gt; r)</span> </span>&#123; <span class="comment">/* Called only by Reference class */</span></span><br><span class="line">    <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">        <span class="comment">// 获得锁之后检查引用是否已经被加入过或者已经被移除</span></span><br><span class="line">        ReferenceQueue&lt;?&gt; queue = r.queue;</span><br><span class="line">        <span class="keyword">if</span> ((queue == NULL) || (queue == ENQUEUED)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">assert</span> queue == <span class="keyword">this</span>;</span><br><span class="line">        r.queue = ENQUEUED;<span class="comment">// 设置已入队状态</span></span><br><span class="line">        r.next = (head == <span class="keyword">null</span>) ? r : head;<span class="comment">//后进先出的队列，后进来的引用先被取出处理</span></span><br><span class="line">        head = r;</span><br><span class="line">        queueLength++;</span><br><span class="line">        <span class="keyword">if</span> (r <span class="keyword">instanceof</span> FinalReference) &#123;</span><br><span class="line">            sun.misc.VM.addFinalRefCount(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        lock.notifyAll();<span class="comment">//发布通知可以从中取出引用处理了如remove方法</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当一个引用进入队列之后，说明这个引用所指向的对象将要被回收了，这时候我们可以从队列中取出引用以便进行回收前的一些处理，从队列中取出引用的操作如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Reference&lt;? extends T&gt; poll() &#123;</span><br><span class="line">    <span class="keyword">if</span> (head == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;<span class="comment">//没有将被回收的对象，返回null</span></span><br><span class="line">    <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">        <span class="keyword">return</span> reallyPoll();<span class="comment">//否则链表操作加锁并从中取出引用</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> Reference&lt;? extends T&gt; reallyPoll() &#123;       <span class="comment">/* Must hold lock */</span></span><br><span class="line">    Reference&lt;? extends T&gt; r = head;</span><br><span class="line">    <span class="keyword">if</span> (r != <span class="keyword">null</span>) &#123;<span class="comment">// 和放入队列的逻辑相同：取出头引用处理并重新设置头</span></span><br><span class="line">        head = (r.next == r) ?</span><br><span class="line">            <span class="keyword">null</span> :</span><br><span class="line">            r.next; <span class="comment">// Unchecked due to the next field having a raw type in Reference</span></span><br><span class="line">        r.queue = NULL;<span class="comment">//确保取出的引用不会再被放入队列</span></span><br><span class="line">        r.next = r;</span><br><span class="line">        queueLength--;</span><br><span class="line">        <span class="keyword">if</span> (r <span class="keyword">instanceof</span> FinalReference) &#123;</span><br><span class="line">            sun.misc.VM.addFinalRefCount(-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>除了<code>poll()</code>方法可以从引用队列中取出将要被回收的对象引用外，还有<code>remove()</code>、<code>remove(long timeout)</code>方法具有相同的功能，它们相当于轮询版的<code>poll()</code>，这个两个方法会一直阻塞直到有引用被放入队列中或者超时时间已过。</p>
+<p>remove方法在<code>Finalizer</code>中有相应的应用场景，此类是jvm专用用来处理对象在被回收时执行对象中<code>finalize()</code>方法的，自动启动一个线程不断从注册的队列中取出引用并在回收指向对象时执行其<code>finalize()</code>方法。</p>
+<h2 id="几种引用"><a href="#几种引用" class="headerlink" title="几种引用"></a>几种引用</h2><ol>
+<li><code>SoftReference</code>：软引用，这种引用会根据内存需求任凭被垃圾回收器清除，即内存充足时不会被回收，反之被回收，因此软引用常被用来实现内存敏感的缓存。jvm会保证所有指向软可达对象的软引用在抛出<code>OOM</code>之前被清除。</li>
+<li><code>WeakReference</code>：弱引用，它们并不禁止其指示对象变得可终结，并被终结，然后被回收。弱引用最常用于实现规范化的映射。假定垃圾回收器确定在某一时间点上某个对象是弱可到达对象。这时，它将自动清除针对此对象的所有弱引用，以及通过强引用链和软引用，可以从其到达该对象的针对任何其他弱可到达对象的所有弱引用。同时它将声明所有以前的弱可到达对象为可终结的。在同一时间或晚些时候，它将那些已经向引用队列注册的新清除的弱引用加入队列。</li>
+<li><code>PhantomReference</code>：虚引用，在回收器确定其指示对象可另外回收之后，被加入队列。虚引用最常见的用法是以某种可能比使用 Java 终结机制更灵活的方式来指派 pre-mortem 清除动作。<ul>
+<li>如果垃圾回收器确定在某一特定时间点上虚引用的指示对象是虚可到达对象，那么在那时或者在以后的某一时间，它会将该引用加入队列。</li>
+<li>为了确保可回收的对象仍然保持原状，虚引用的指示对象不能被获取：虚引用的 get 方法总是返回 null。</li>
+<li>与软引用和弱引用不同，虚引用在加入队列时并没有通过垃圾回收器自动清除。通过虚引用可到达的对象将仍然保持原状，直到所有这类引用都被清除，或者它们都变得不可到达。</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="Code Porter 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Code Porter
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://balderdasher.github.io/2021/09/29/references-in-java/" title="Java中的引用Reference">https://balderdasher.github.io/2021/09/29/references-in-java/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/18/zookeeper知识点/" rel="next" title="zookeeper知识点">
+                <i class="fa fa-chevron-left"></i> zookeeper知识点
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/09/29/live-animatedly/" rel="prev" title="活生生地生活">
+                活生生地生活 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMjQ2OS85MDMw"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/codeporter.jpg" alt="Code Porter">
+            
+              <p class="site-author-name" itemprop="name">Code Porter</p>
+              <p class="site-description motion-element" itemprop="description">男猿，北蛰</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/balderdasher" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:balderdasher@msn.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引用包规范"><span class="nav-number">1.</span> <span class="nav-text">引用包规范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通知"><span class="nav-number">1.1.</span> <span class="nav-text">通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动清除引用"><span class="nav-number">1.2.</span> <span class="nav-text">自动清除引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可到达性"><span class="nav-number">1.3.</span> <span class="nav-text">可到达性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference类"><span class="nav-number">2.</span> <span class="nav-text">Reference类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概览"><span class="nav-number">2.1.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造函数"><span class="nav-number">2.2.</span> <span class="nav-text">构造函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#辅助类ReferenceQueue"><span class="nav-number">2.3.</span> <span class="nav-text">辅助类ReferenceQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reference的状态"><span class="nav-number">2.4.</span> <span class="nav-text">Reference的状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference实现原理"><span class="nav-number">3.</span> <span class="nav-text">Reference实现原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几种引用"><span class="nav-number">4.</span> <span class="nav-text">几种引用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Code Porter</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">67.9k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.3</div>
+
+
+
+<script>
+    var oldTitle = document.title;
+    document.addEventListener("visibilitychange", function () {
+        var isHidden = document.hidden;
+        if (isHidden) {
+            document.title = "爱我~别走〒_〒";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 3000);
+
+        } else {
+            document.title = "终于等到你~还好我没放弃.";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 2000);
+        }
+    })
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

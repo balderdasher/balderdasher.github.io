@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,读书笔记,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="男猿北蛰" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="注解(也被称为元数据)为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便地使用这些数据">
+<meta name="keywords" content="java,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Java编程思想》第20章-注解">
+<meta property="og:url" content="https://balderdasher.github.io/2017/06/02/thinking-in-java-annotation/index.html">
+<meta property="og:site_name" content="男猿北蛰">
+<meta property="og:description" content="注解(也被称为元数据)为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便地使用这些数据">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-09-29T06:04:29.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Java编程思想》第20章-注解">
+<meta name="twitter:description" content="注解(也被称为元数据)为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便地使用这些数据">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://balderdasher.github.io/2017/06/02/thinking-in-java-annotation/">
+
+
+
+
+
+  <title>《Java编程思想》第20章-注解 | 男猿北蛰</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">男猿北蛰</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">CodePorter's Blog</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://balderdasher.github.io/2017/06/02/thinking-in-java-annotation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Code Porter">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/codeporter.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="男猿北蛰">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Java编程思想》第20章-注解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-02T11:11:05+08:00">
+                2017-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,627 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p><strong>注解(也被称为<em>元数据</em>)为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便地使用这些数据</strong></p>
+</blockquote>
+<a id="more"></a>
+<h2 id="20-1-基本语法"><a href="#20-1-基本语法" class="headerlink" title="20.1 基本语法"></a>20.1 基本语法</h2><p>下面的写法很少见吧:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Testable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Executing..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@Test</span> <span class="function"><span class="keyword">void</span> <span class="title">testExecute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        execute();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个<code>@Test</code>的位置有点奇怪，平常不都是放在方法上面的吗，其实注解<code>@Test</code>可以与任何修饰符共同作用于方法，例如<code>public</code>、<code>static</code>或<code>void</code>，被注解的方法与其他的方法没有区别，从语法角度看，注解的使用方式几乎与修饰符的使用一模一样。</p>
+<h3 id="20-1-1-定义注解"><a href="#20-1-1-定义注解" class="headerlink" title="20.1.1 定义注解"></a>20.1.1 定义注解</h3><p>下面是前面的程序用到的<code>@Test</code>注解的定义，注解的定义看起来很像接口的定义。事实上，与其他任何Java接口一样，注解也将会编译成class文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 注解定义</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 14:41</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Test &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>除了@符号，<code>@Test</code>的定义很像一个空的接口，定义注解时，会需要一些<code>元注解</code>（meta-annotation）,如<code>@Target</code>和<code>@Retention</code>。它们定含义分别是：</p>
+<ul>
+<li>@Target用来定义注解将用于什么地方（例如是一个方法或者一个属性）。</li>
+<li>@Retention用来定义该注解在哪一个级别可用，级别有三个：源代码（SOURCE）、类文件中（CLASS）和运行时（RUNTIME）。</li>
+</ul>
+<p>在注解中一般都会包含一些元素表示某些值，当分析处理注解时，程序或工具可以利用这些值，注解的元素看起来就像接口的方法，不同的是注解中可以为其指定默认值。</p>
+<p>没有元素的注解称为<strong>标记注解</strong>，上面的<code>@Test</code>就是一个标记注解。</p>
+<p>下面是一个简单的注解，可以用来跟踪一个项目中的用例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 一个简单的注解</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 14:51</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> UseCase &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">id</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">description</span><span class="params">()</span> <span class="keyword">default</span> "no description"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在以下类中，有三个方法使用了此注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * "<span class="doctag">@UseCase</span>"注解的使用</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 14:57</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PasswordUtil</span> </span>&#123;</span><br><span class="line">    <span class="meta">@UseCase</span>(id = <span class="number">47</span>, description = <span class="string">"密码必须包含至少一位数字"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">validatePassword</span><span class="params">(String password)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (password.matches(<span class="string">"\\w*\\d\\w*"</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@UseCase</span>(id = <span class="number">48</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">encryptPassword</span><span class="params">(String password)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> StringBuilder(password).reverse().toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">checkForNewPassword</span><span class="params">(List&lt;String&gt; prevPasswords, String password)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> !prevPasswords.contains(password);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，注解的元素在使用时表现为<code>名-值对</code>的形式，并需要置于<code>@UseCase</code>声明之后的括号内，在使用时如果没有给出某个元素的值，则使用这个元素的默认值。</p>
+<h3 id="20-1-2-元注解"><a href="#20-1-2-元注解" class="headerlink" title="20.1.2 元注解"></a>20.1.2 元注解</h3><p>Java目前只内置了三种标准注解（<code>@OverRide</code>、<code>@Deprecated</code>、<code>@SuppressWarning</code>），以及四种元注解。元注解专门负责注解其他注解：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">元注解</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">@Target</td>
+<td style="text-align:left">表示该注解可以用于什么地方。可能的<code>ElementType</code>参数包括：<br>CONSTRUCTOR：构造器的声明<br>FIELD：域声明（包括enum实例）<br>LOCAL_VARIABLE：局部变量声明<br>METHOD：方法声明<br>PACKAGE：包声明<br>PARAMETER：参数声明<br>TYPE：类、接口（包括注解类型）或enum声明</td>
+</tr>
+<tr>
+<td style="text-align:left">@Retention</td>
+<td style="text-align:left">表示需要在什么级别保存该注解信息。可选的<code>RetentionPolicy</code>参数包括：<br>SOURCE：注解将被编译器丢弃<br>CLASS：注解在class文件中可用，但会被VM丢弃<br>RUNTIME：VM将在运行期也保留注解，因此可以通过反射机制读取注解信息</td>
+</tr>
+<tr>
+<td style="text-align:left">@Documented</td>
+<td style="text-align:left">将此注解包含在Javadoc中</td>
+</tr>
+<tr>
+<td style="text-align:left">@Inherited</td>
+<td style="text-align:left">允许子类继承父类中的注解</td>
+</tr>
+</tbody>
+</table>
+<h2 id="20-2-编写注解处理器"><a href="#20-2-编写注解处理器" class="headerlink" title="20.2 编写注解处理器"></a>20.2 编写注解处理器</h2><p>一下是一个简单的注解注解处理器，用来查找@UseCase标记，提供了一组id值，它会列出在<code>PasswrodUtil</code>中找到的用例，以及缺失的用例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mrdios.competencymatrix.java.readingnotes.ThinkingInJava.chapter20;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 注解处理器</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 15:39</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UseCaseTracker</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">trackUseCases</span><span class="params">(List&lt;Integer&gt; useCases,Class&lt;?&gt; c1)</span></span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Method m:c1.getDeclaredMethods())&#123;</span><br><span class="line">            UseCase uc = m.getAnnotation(UseCase.class);</span><br><span class="line">            <span class="keyword">if</span> (uc != <span class="keyword">null</span>)&#123;</span><br><span class="line">                System.out.println(<span class="string">"Found Use Case："</span> + uc.id() + <span class="string">" "</span> + uc.description());</span><br><span class="line">                useCases.remove(<span class="keyword">new</span> Integer(uc.id()));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : useCases)&#123;</span><br><span class="line">            System.out.println(<span class="string">"Warning：Missing use case-"</span> + i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;Integer&gt; useCases = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Collections.addAll(useCases,<span class="number">47</span>,<span class="number">48</span>,<span class="number">49</span>,<span class="number">50</span>);</span><br><span class="line">        trackUseCases(useCases,PasswordUtil.class);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Found Use Case：49 检查是不是新的密码</span><br><span class="line">Found Use Case：48 no description</span><br><span class="line">Found Use Case：47 密码必须包含至少一位数字</span><br><span class="line">Warning：Missing use case-50</span><br></pre></td></tr></table></figure>
+<h3 id="20-2-1-注解元素"><a href="#20-2-1-注解元素" class="headerlink" title="20.2.1 注解元素"></a>20.2.1 注解元素</h3><p>注解元素可用的类型如下所示：</p>
+<ul>
+<li>所有基本类型(int、float、boolean等)</li>
+<li>String</li>
+<li>enum</li>
+<li>Annotation</li>
+<li>以上类型的数组</li>
+</ul>
+<p>如果使用了以上类型之外的其他类型，编译器就会报错，包括任何包装类型，注解可以嵌套。</p>
+<h3 id="20-2-2-默认值限制"><a href="#20-2-2-默认值限制" class="headerlink" title="20.2.2 默认值限制"></a>20.2.2 默认值限制</h3><p>编译器对注解中元素的默认值有严格的限制：元素不能有不确定的值，要么具有默认值，要么使用注解时提供元素的值。</p>
+<p>另外，对于非基本类型的元素，无论是声明还是在注解接口中定义默认值时，都不能以null作为其值，这个约束使得处理器很难表现一个元素的存在或缺失的状态，为了绕开这个约束，可以定义一些特殊的值，例如<code>空字符串</code>或者<code>负数</code>，以此来表示某个元素不存在</p>
+<h3 id="20-2-3-生成外部文件"><a href="#20-2-3-生成外部文件" class="headerlink" title="20.2.3 生成外部文件"></a>20.2.3 生成外部文件</h3><p>有些框架需要一些额外的信息才能与源代码协同工作，比如hibernate的hbm映射文件，这些描述文件脱离了源代码之外，所以在我们编写了Javabean之后还要忍受编写xml文件的烦恼，于此同时，同一个类拥有了两个单独的信息源，经常也会导致代码同步问题。</p>
+<p>每当上述情况出现的时候，注解的价值就体现出来了，比如我们希望提供一些基本的对象/关系映射功能，能够自动生成数据库表，我们可以抛弃xml描述文件的方式，使用注解，将所有的信息保留在JavaBean源文件中，以下就是用注解的实现方式：</p>
+<p>首先，需要一个新的注解，用来定义与Bean关联的数据库表的名字，以下的注解告诉处理器，你需要为我生成一个数据库表：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 数据库表的注解，用于实体bean类上，说明该实体生成的数据库表信息</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 16:17</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> DBTable &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">name</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来就是javaBean的注解，用于描述JavaBean中的属性与生成数据库表中的字段的一些联系：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 表字段约束注解</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 16:21</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.FIELD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Constraints &#123;</span><br><span class="line">    <span class="comment">/* 是否主键 */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">primaryKey</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 是否允许为空 */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">allowNull</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">true</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 是否唯一 */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">unique</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * sql类型</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 16:26</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.FIELD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> SQLString &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">    <span class="function">Constraints <span class="title">constraints</span><span class="params">()</span> <span class="keyword">default</span> @Constraints</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * sql类型</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 16:28</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target</span>(ElementType.FIELD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> SQLInteger &#123;</span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">    <span class="function">Constraints <span class="title">constraints</span><span class="params">()</span> <span class="keyword">default</span> @Constraints</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来是一个简单的Bean定义，使用了以上这些注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * JavaBean</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 16:33</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@DBTable</span>(name = <span class="string">"MEMBER"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Member</span> </span>&#123;</span><br><span class="line">    <span class="meta">@SQLString</span>(<span class="number">30</span>)</span><br><span class="line">    <span class="keyword">private</span> String firstName;</span><br><span class="line">    <span class="meta">@SQLString</span>(<span class="number">50</span>)</span><br><span class="line">    <span class="keyword">private</span> String lastName;</span><br><span class="line">    <span class="meta">@SQLInteger</span></span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="meta">@SQLString</span>(value = <span class="number">30</span>, constraints = <span class="meta">@Constraints</span>(primaryKey = <span class="keyword">true</span>))</span><br><span class="line">    <span class="keyword">private</span> String handle;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> memberCount;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getFirstName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> firstName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getLastName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> lastName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getAge</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getHandle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> handle;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> handle;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="20-2-4-注解不支持继承"><a href="#20-2-4-注解不支持继承" class="headerlink" title="20.2.4 注解不支持继承"></a>20.2.4 注解不支持继承</h3><p>不能使用<code>extends</code>关键字来继承某个@interface。也就是说：Java在定义注解时，不能继承自某个其他的注解。</p>
+<h3 id="20-2-5-实现处理器"><a href="#20-2-5-实现处理器" class="headerlink" title="20.2.5 实现处理器"></a>20.2.5 实现处理器</h3><p>以下是一个针对上面对象/关系映射注解处理器的例子，将读取一个类文件，检查其中的数据库注解，并生成用来创建数据库的SQL语句：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mrdios.competencymatrix.java.readingnotes.ThinkingInJava.chapter20.framework;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Annotation;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 注解处理器</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> mrdios</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2016-07-26 17:01</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TableCreator</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        List&lt;Class&lt;?&gt;&gt; beanClasses = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Collections.addAll(beanClasses, Member.class);</span><br><span class="line">        process(beanClasses);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(List&lt;Class&lt;?&gt;&gt; beanClasses)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Class c1 : beanClasses) &#123;</span><br><span class="line">            Class&lt;?&gt; c = Class.forName(c1.getName());</span><br><span class="line">            DBTable dbTable = c.getAnnotation(DBTable.class);</span><br><span class="line">            <span class="keyword">if</span> (dbTable == <span class="keyword">null</span>) &#123;</span><br><span class="line">                System.out.println(<span class="string">"No DBTable annotations in class "</span> + c.getName());</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            String tableName = dbTable.name();</span><br><span class="line">            <span class="keyword">if</span> (tableName.length() &lt; <span class="number">1</span>) &#123;</span><br><span class="line">                tableName = c.getSimpleName().toUpperCase();</span><br><span class="line">            &#125;</span><br><span class="line">            List&lt;String&gt; columnDefs = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">            <span class="keyword">for</span> (Field field : c.getDeclaredFields()) &#123;</span><br><span class="line">                String columnName;</span><br><span class="line">                Annotation[] anns = field.getDeclaredAnnotations();</span><br><span class="line">                <span class="keyword">if</span> (anns.length &lt; <span class="number">1</span>) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (field.isAnnotationPresent(SQLInteger.class)) &#123;</span><br><span class="line">                    SQLInteger sInt = field.getAnnotation(SQLInteger.class);</span><br><span class="line">                    <span class="keyword">if</span> (sInt.name().length() &lt; <span class="number">1</span>) &#123;</span><br><span class="line">                        columnName = field.getName().toUpperCase();</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        columnName = sInt.name();</span><br><span class="line">                    &#125;</span><br><span class="line">                    columnDefs.add(columnName + <span class="string">" INT"</span> + getConstraints(sInt.constraints()));</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (field.isAnnotationPresent(SQLString.class)) &#123;</span><br><span class="line">                    SQLString sString = field.getAnnotation(SQLString.class);</span><br><span class="line">                    <span class="keyword">if</span> (sString.name().length() &lt; <span class="number">1</span>) &#123;</span><br><span class="line">                        columnName = field.getName().toUpperCase();</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        columnName = sString.name();</span><br><span class="line">                    &#125;</span><br><span class="line">                    columnDefs.add(columnName + <span class="string">" VARCHAR("</span> + sString.value() + <span class="string">")"</span> + getConstraints(sString.constraints()));</span><br><span class="line">                &#125;</span><br><span class="line">                StringBuilder createCommand = <span class="keyword">new</span> StringBuilder(<span class="string">"CREATE TABLE "</span> + tableName + <span class="string">"("</span>);</span><br><span class="line">                <span class="keyword">for</span> (String columnDef : columnDefs) &#123;</span><br><span class="line">                    createCommand.append(<span class="string">"\n   "</span>).append(columnDef).append(<span class="string">","</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                String tableCreate = createCommand.substring(<span class="number">0</span>, createCommand.length() - <span class="number">1</span>) + <span class="string">");"</span>;</span><br><span class="line">                System.out.println(<span class="string">"Table Creation SQL for "</span> + c.getName() + <span class="string">" is : \n"</span> + tableCreate);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">getConstraints</span><span class="params">(Constraints con)</span> </span>&#123;</span><br><span class="line">        String constraints = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">if</span> (!con.allowNull()) &#123;</span><br><span class="line">            constraints += <span class="string">" NOT NULL"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (con.primaryKey()) &#123;</span><br><span class="line">            constraints += <span class="string">" PRIMARY KEY"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (con.unique()) &#123;</span><br><span class="line">            constraints += <span class="string">" UNIQUE"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> constraints;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Table Creation SQL for com.mrdios.competencymatrix.java.readingnotes.ThinkingInJava.chapter20.framework.Member is : </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">MEMBER</span>(</span><br><span class="line">   FIRSTNAME <span class="built_in">VARCHAR</span>(<span class="number">30</span>));</span><br><span class="line">Table Creation SQL for com.mrdios.competencymatrix.java.readingnotes.ThinkingInJava.chapter20.framework.Member is : </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">MEMBER</span>(</span><br><span class="line">   FIRSTNAME <span class="built_in">VARCHAR</span>(<span class="number">30</span>),</span><br><span class="line">   LASTNAME <span class="built_in">VARCHAR</span>(<span class="number">50</span>));</span><br><span class="line">Table Creation SQL for com.mrdios.competencymatrix.java.readingnotes.ThinkingInJava.chapter20.framework.Member is : </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">MEMBER</span>(</span><br><span class="line">   FIRSTNAME <span class="built_in">VARCHAR</span>(<span class="number">30</span>),</span><br><span class="line">   LASTNAME <span class="built_in">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">   AGE <span class="built_in">INT</span>);</span><br><span class="line">Table Creation SQL for com.mrdios.competencymatrix.java.readingnotes.ThinkingInJava.chapter20.framework.Member is : </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">MEMBER</span>(</span><br><span class="line">   FIRSTNAME <span class="built_in">VARCHAR</span>(<span class="number">30</span>),</span><br><span class="line">   LASTNAME <span class="built_in">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">   AGE <span class="built_in">INT</span>,</span><br><span class="line">   HANDLE <span class="built_in">VARCHAR</span>(<span class="number">30</span>) PRIMARY <span class="keyword">KEY</span>);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="Code Porter 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Code Porter
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://balderdasher.github.io/2017/06/02/thinking-in-java-annotation/" title="《Java编程思想》第20章-注解">https://balderdasher.github.io/2017/06/02/thinking-in-java-annotation/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          
+            <a href="/tags/读书笔记/" rel="tag"><i class="fa fa-tag"></i> 读书笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/01/thinking-in-java-enum/" rel="next" title="《Java编程思想》第19章-枚举类型">
+                <i class="fa fa-chevron-left"></i> 《Java编程思想》第19章-枚举类型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/05/thinking-in-java-concurrent/" rel="prev" title="《Java编程思想》第21章-并发">
+                《Java编程思想》第21章-并发 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMjQ2OS85MDMw"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/codeporter.jpg" alt="Code Porter">
+            
+              <p class="site-author-name" itemprop="name">Code Porter</p>
+              <p class="site-description motion-element" itemprop="description">男猿，北蛰</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/balderdasher" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:balderdasher@msn.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#20-1-基本语法"><span class="nav-number">1.</span> <span class="nav-text">20.1 基本语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#20-1-1-定义注解"><span class="nav-number">1.1.</span> <span class="nav-text">20.1.1 定义注解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-1-2-元注解"><span class="nav-number">1.2.</span> <span class="nav-text">20.1.2 元注解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#20-2-编写注解处理器"><span class="nav-number">2.</span> <span class="nav-text">20.2 编写注解处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#20-2-1-注解元素"><span class="nav-number">2.1.</span> <span class="nav-text">20.2.1 注解元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-2-2-默认值限制"><span class="nav-number">2.2.</span> <span class="nav-text">20.2.2 默认值限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-2-3-生成外部文件"><span class="nav-number">2.3.</span> <span class="nav-text">20.2.3 生成外部文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-2-4-注解不支持继承"><span class="nav-number">2.4.</span> <span class="nav-text">20.2.4 注解不支持继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-2-5-实现处理器"><span class="nav-number">2.5.</span> <span class="nav-text">20.2.5 实现处理器</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Code Porter</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">67.9k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.3</div>
+
+
+
+<script>
+    var oldTitle = document.title;
+    document.addEventListener("visibilitychange", function () {
+        var isHidden = document.hidden;
+        if (isHidden) {
+            document.title = "爱我~别走〒_〒";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 3000);
+
+        } else {
+            document.title = "终于等到你~还好我没放弃.";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 2000);
+        }
+    })
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

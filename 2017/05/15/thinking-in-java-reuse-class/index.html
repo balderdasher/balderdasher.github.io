@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,读书笔记,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="男猿北蛰" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="在java中，问题的解决都是围绕类展开的，我们通过创建新类，也可以使用别人已经开发并调试好的类而不用再从头开始编写，这时候就称为复用类  复用类的窍门在于使用类而不破坏现有程序代码，包括两种方法（代码重用机制）：">
+<meta name="keywords" content="java,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Java编程思想》第7章-复用类">
+<meta property="og:url" content="https://balderdasher.github.io/2017/05/15/thinking-in-java-reuse-class/index.html">
+<meta property="og:site_name" content="男猿北蛰">
+<meta property="og:description" content="在java中，问题的解决都是围绕类展开的，我们通过创建新类，也可以使用别人已经开发并调试好的类而不用再从头开始编写，这时候就称为复用类  复用类的窍门在于使用类而不破坏现有程序代码，包括两种方法（代码重用机制）：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/xCkyfzN.png">
+<meta property="og:image" content="http://i.imgur.com/T7UX73N.png">
+<meta property="og:image" content="http://i.imgur.com/Yt3Xqtq.png">
+<meta property="og:updated_time" content="2021-09-29T06:04:29.571Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Java编程思想》第7章-复用类">
+<meta name="twitter:description" content="在java中，问题的解决都是围绕类展开的，我们通过创建新类，也可以使用别人已经开发并调试好的类而不用再从头开始编写，这时候就称为复用类  复用类的窍门在于使用类而不破坏现有程序代码，包括两种方法（代码重用机制）：">
+<meta name="twitter:image" content="http://i.imgur.com/xCkyfzN.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://balderdasher.github.io/2017/05/15/thinking-in-java-reuse-class/">
+
+
+
+
+
+  <title>《Java编程思想》第7章-复用类 | 男猿北蛰</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">男猿北蛰</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">CodePorter's Blog</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://balderdasher.github.io/2017/05/15/thinking-in-java-reuse-class/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Code Porter">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/codeporter.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="男猿北蛰">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Java编程思想》第7章-复用类</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-15T15:48:56+08:00">
+                2017-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,927 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  18 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>在java中，问题的解决都是围绕类展开的，我们通过创建新类，也可以使用别人已经开发并调试好的类而不用再从头开始编写，这时候就称为<code>复用类</code></p>
+</blockquote>
+<p>复用类的窍门在于使用类而不破坏现有程序代码，包括两种方法（代码重用机制）：<br><a id="more"></a></p>
+<ol>
+<li>在新类中使用现有类的对象，由于新类是由现有类的对象组成，所以这种方法称为<code>组合</code></li>
+<li>按照现有类的类型来创建新类，采用现有类的形式并添加新代码而不改变现有类的形式，这种方式称为<code>继承</code></li>
+</ol>
+<h2 id="7-1-组合语法"><a href="#7-1-组合语法" class="headerlink" title="7.1 组合语法"></a>7.1 组合语法</h2><p>组合技术十分简单，基本上我们天天都在用，比如要创建一个职员类，一个职员有姓名、年龄、月薪、部门等属性，我们在创建这个类的时候需要用相应的数据类型来表示这些属性，就拿姓名属性来说，到底用什么类型表示它呢，对，就是字符串，可是，这个字符串类型在java中应该用什么类来表示呢，巧了，java正好提供了<code>String</code>这个类来表示字符串类型，所以我们就直接拿来使用而不必自己再写一个表示字符串的类了。</p>
+<p>之后你会发现，年龄（整数）、月薪（带小数的数字）属性在java中都有现成的类可以使用。但是到了部门这个属性的时候你一脸懵逼，在java中没有表示部门这个属性的类可以使用了，怎么办，只能自己写一个了。</p>
+<p>如果幸运的话，编写部门类的时候我们不会再碰上需要我们再写新类来表示部门类中某个属性的情况。</p>
+<p>进展很顺利，部门类<code>Dept</code>写完了，我们像使用<code>String</code>类一样使用<code>Dept</code>类来表示职员的部门属性类型，因为使用java类库现有的类和我们自己编写的类本质上其实没什么不同。就这样，职员类便写好了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Employ</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> String name;<span class="comment">//姓名</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> age;	<span class="comment">//年龄</span></span><br><span class="line">	<span class="keyword">private</span> Dept dept;  <span class="comment">//部门</span></span><br><span class="line">	<span class="comment">/** getters and setters **/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>原则上来说，只要在一个类中使用了别的类型，都可以叫做复用了类。</p>
+<h3 id="7-1-1-引用的初始化"><a href="#7-1-1-引用的初始化" class="headerlink" title="7.1.1 引用的初始化"></a>7.1.1 引用的初始化</h3><p>职员类写好了，假定我们使用默认的构造器创建了一个职员对象然后输出这个对象的话，会发现除了年龄为0之外，另外两个属性都是<code>null</code>（前提是你重写了toString()方法在其中返回了职员对象的属性信息）。</p>
+<p>这是因为类中基本类型的域会被初始化成其默认值，而对象的引用则会被初始化成<code>null</code>，编译器为了不增加不必要的负担，不会简单地为每个引用都创建默认对象，如果想初始化这些引用，可以在以下几个位置进行：</p>
+<ul>
+<li>在定义对象的地方，这意味着这个引用总是能够在构造器调用之前被初始化</li>
+<li>在构造器内部</li>
+<li>在正要使用这些对象之前，这种方式称为<code>惰性初始化</code>，这种方式对于减少内存的负担是很有用的，因为有时候一个引用被声明之后根本就没有被使用，虽然从JVM的角度来说：从未被使用的对象将被回收以释放其占据的内存，但是终究来说这个没用的对象曾经还是占用过内存（强迫症）</li>
+<li>使用实例初始化（比如常用的使用新建的对象去调用<code>set</code>方法初始化）</li>
+</ul>
+<h2 id="7-2-继承语法"><a href="#7-2-继承语法" class="headerlink" title="7.2 继承语法"></a>7.2 继承语法</h2><blockquote>
+<p>继承在java中无处不在，到目前为止，所有java类中，除了老祖宗<code>Object</code>类以外，所有其他的类都是继承着别的类的，除非明确指出继承哪个类，否则就是隐式地继承java标准根基类<code>Object</code>。</p>
+<p><em>语法结构</em>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Subclass</span> <span class="keyword">extends</span> <span class="title">Supclass</span> </span>&#123;</span><br><span class="line">&gt; <span class="comment">/** class definition... */</span></span><br><span class="line">&gt; &#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="7-2-1-初始化基类"><a href="#7-2-1-初始化基类" class="headerlink" title="7.2.1 初始化基类"></a>7.2.1 初始化基类</h3><blockquote>
+<p>　　继承并不只是复用基类的接口。当创建一个子类的对象时，该对象还包含了一个基类的子对象。这个子对象与你用基类直接创建的对象是一样的。二者的区别在于子类的对象来自于外部，而基类的子对象被包装在子类的对象内部。<br>　　对基类对象的正确初始化也是至关重要的，仅有一种方法保证这一点：<em>在子类构造器中调用基类构造器来执行初始化，这个工作java帮我们自动完成了</em>。</p>
+</blockquote>
+<p>在继承关系中，类的初始化是有一定顺序的，这种顺序是由基类 <strong>向外</strong> 扩散，即在子类初始化之前，基类的初始化就已经完成了，即使在子类中没有创建构造器，编译器也会为我们合成一个默认的构造器，并在其中调用基类的构造器。</p>
+<p>LKZS：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExtendsDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Son son = <span class="keyword">new</span> Son();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Grandpa</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Grandpa</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Grandpa: 我是你爷爷"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dad</span> <span class="keyword">extends</span> <span class="title">Grandpa</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Dad</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Dad: 我是你爹"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Son</span> <span class="keyword">extends</span> <span class="title">Dad</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Son</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Son: 我是尼古拉斯.赵四，爹爹爷爷好"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Grandpa：我是你爷爷</span><br><span class="line">Dad：我是你爹</span><br><span class="line">Son：我是尼古拉斯.赵四，爹爹爷爷好</span><br></pre></td></tr></table></figure>
+<p>以上例子中均只含有默认构造器，<em>如果没有默认构造器或者想调用带参数的构造器时，必须使用关键字<code>super</code>显示调用</em></p>
+<h2 id="7-3-代理"><a href="#7-3-代理" class="headerlink" title="7.3 代理"></a>7.3 代理</h2><p>除了组合、继承，第三种关系称为“代理”。</p>
+<p>在继承中，如果一个类<code>A</code>继承了类<code>B</code>，那么<code>A</code>可以调用它能够调用的所有<code>B</code>中的可调用方法，但是，如果<code>B</code>中的某个方法因为调用的危险性或者<code>A</code>根本就不需要，这时候又该如何呢？</p>
+<p>打个比方：一个土豪爸爸可以干许多事，比如买豪车、买豪宅、跟小秘调情、嗑药等，土豪老了之后子承父业的儿子也可以买豪车、买豪宅，但是跟他老爹宠幸的小秘调情是不被允许的，爸爸也会禁止他这么做（程序表现就是一个<code>private</code>方法），至于嗑药，也许老爸不会限制，但是老司机可以不代表小司机也可以，如果儿子不知道节制嗑死了或者是被朝阳群众举报了就不好了。</p>
+<p>针对上述尴尬的情形，继承显然已经不再合适，这时候代理起到了作用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dad</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buyCar</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"买豪车..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buyHouse</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"买豪宅..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flirt</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"玩小秘..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 儿子只能买车买房但是不能玩小秘并且限制嗑药</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Son</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> Dad dad;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Son</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">        <span class="keyword">this</span>.dad = <span class="keyword">new</span> Dad();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buyCar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        dad.buyCar();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buyHouse</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        dad.buyHouse();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Son son = <span class="keyword">new</span> Son(<span class="string">"三胖"</span>);</span><br><span class="line">        son.buyCar();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在，儿子只能买车或者买房，不能干别的了。</p>
+<p>从程序中可以看出，儿子在买车或买房时，实际上调用爸爸的相应方法，所以这时候就可以把儿子看成是爸爸，美其名曰：爸爸的一个代理，爸爸限制了这个代理的功能。就像一个世袭制的统治者，对外来说是谁不重要，只要你能说上话就行，但是对内来说，这个统治者的权利也许是经过垂帘听政的老爹阉割过的。</p>
+<p>由此可以引申出：代理也是可以很灵活的，可以有多个代理类，比如这个爸爸还有一个儿子，这孩子基本算是没救了，所以除了能买房买车之外，老爸还允许他嗑药。</p>
+<p>此处有一项技能可以get√</p>
+<h3 id="使用JetBrains-Idea-IDE生成代理对象的代理方法代码"><a href="#使用JetBrains-Idea-IDE生成代理对象的代理方法代码" class="headerlink" title="使用JetBrains Idea IDE生成代理对象的代理方法代码"></a>使用JetBrains Idea IDE生成代理对象的代理方法代码</h3><p>以之前的程序作为例子：在<code>Son</code>类中生成代理对象<code>Dad</code>的代理方法代码步骤如下</p>
+<ol>
+<li><p>在代理类<code>Son</code>中使用IDE生成快捷键<code>Alt</code>+<code>Insert</code>,或者右键菜单选择<code>Generate</code></p>
+</li>
+<li><p>在<code>Generate</code>选项中选择<code>Delegate Methods</code><br><img src="http://i.imgur.com/xCkyfzN.png" alt="Generate"></p>
+</li>
+<li><p>选择要代理的对象属性<br><img src="http://i.imgur.com/T7UX73N.png" alt="选择代理对象属性"></p>
+</li>
+<li><p>最后一步：选择要代理的方法，点击<code>OK</code><br><img src="http://i.imgur.com/Yt3Xqtq.png" alt="选择要代理的方法"></p>
+</li>
+</ol>
+<p>当执行以上的第3步操作的时候，也就是选择要代理的对象属性时，你会发现，你不能多选，这说明什么呢，也许很有可能说明：在java中，一个类不能代理多个类。结合之前的分析可以得出一个结论：<strong><em>java中，一个类可以拥有多个代理类，但是它本身只能代理一个类</em></strong></p>
+<h2 id="7-4-结合使用组合和继承"><a href="#7-4-结合使用组合和继承" class="headerlink" title="7.4 结合使用组合和继承"></a>7.4 结合使用组合和继承</h2><h3 id="7-4-1-确保正确清理"><a href="#7-4-1-确保正确清理" class="headerlink" title="7.4.1 确保正确清理"></a>7.4.1 确保正确清理</h3><blockquote>
+<p>在<code>C++</code>中有一个叫<em>析构函数</em>的概念，它是一种在对象被销毁时可以被自动调用的函数。Java中没有析构函数的概念，因为我们不需要去销毁对象，因为我们有<code>GC</code>，垃圾回收器会在必要时回收那些被我们忘掉的对象释放其内存。</p>
+</blockquote>
+<p>如上固然是极好的，但是，你并不知道<code>GC</code>何时将被调用，是否将被调用，所以有时候我们仍需要进行一些必要的清理活动</p>
+<p>通常，当我们要显式地进行一些必要清理时，必须将清理操作放在<code>finally</code>子句当中，确保清理操作肯定能得以执行</p>
+<p>社交现在很火，出现了一些新颖好玩的东西，比如发送的消息固定时间内可以<code>撤回</code>，可以添加<code>阅后即焚</code>的消息等，在我认为，这些对消息有趣的处理方式，也是一种正确清理的例子吧</p>
+<p>就拿<code>阅后即焚</code>来说，发送的消息就是要被清理的对象，阅读消息是一个方法，在这个方法执行完后，也就是我们看完这条消息之后，这条消息要被清理掉，防止被他人看见泄露天机。写成代码大概就是这样的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Message</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String msg;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isRead;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Message</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.msg = msg;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/** getters and setters **/</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">fireAfterRead</span><span class="params">(Message message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            readMessage(message);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            destroyMessage(message);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">destroyMessage</span><span class="params">(Message message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!message.isRead())&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"消息状态异常..."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"开始销毁："</span> + message.getMsg());</span><br><span class="line">        message = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (message == <span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"销毁成功"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"销毁失败"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">readMessage</span><span class="params">(Message message)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"阅读消息:"</span> + message.getMsg());</span><br><span class="line">        message.setRead(Boolean.TRUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        fireAfterRead(<span class="keyword">new</span> Message(<span class="string">"其实我是个演员"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<blockquote>
+<p>阅读消息：其实我是个演员<br>开始销毁：其实我是个演员<br>销毁成功……</p>
+</blockquote>
+<p>如果在移动开发中，<code>destroyMessage</code>方法中可能还会包含从设备屏幕抹除消息然后销毁消息对象等操作。</p>
+<h2 id="7-5-向上转型"><a href="#7-5-向上转型" class="headerlink" title="7.5 向上转型"></a>7.5 向上转型</h2><blockquote>
+<p>基类为子类提供方法，并不是继承最重要的方面，其最重要的方面是用来表现新类和基类之间的关系，这种关系可以用“<em>新类是基类的一种类型</em>”这句话来概括。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 交通工具</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Transport</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">move</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">move</span><span class="params">(Transport transport)</span></span>&#123;</span><br><span class="line">		transport.move();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 汽车</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Car</span> <span class="keyword">extends</span> <span class="title">Transport</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Car car = <span class="keyword">new</span> Car();</span><br><span class="line">        Transport.move(car);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在以上代码中，<code>Transport</code>类中的<code>move()</code>方法可以接受<code>Transport</code>参数看起来很神奇，但是在<code>Car.main()</code>方法中传递的却是一个<code>Car</code>引用，只有一个参数的方法能够接受两种类型的参数看起来很奇怪，但这恰好说明了其实它们已经被当做了一种类型。代码可以对<code>Transport</code>和它的所有子类起作用，汽车可以，自行车、电动车们也可以。这种将<code>Car</code>引用转换为<code>Transport</code>引用的动作，就称为<strong><em>向上转型</em></strong>。</p>
+<p>至于为什么叫向上转型，通俗地说是根据类的继承关系来定的，子类转型成基类，继承图上是由下到上，所以叫向上转型。</p>
+<p>向上转型是安全的，因为它是从一个专用类型向通用类型转换。</p>
+<h3 id="7-5-1-慎用继承"><a href="#7-5-1-慎用继承" class="headerlink" title="7.5.1 慎用继承"></a>7.5.1 慎用继承</h3><p>尽管继承的好处大大的，但是并不代表要尽可能使用它，<strong>继承的使用场合仅限于明确要使用向上转型的时候</strong>，如果必须向上转型，那么继承就是必要的，如果没必要转型，就尽可能使用组合，到底应该使用哪种，只需要自问一下：“我真的需要向上转型吗？”。</p>
+<h2 id="7-6-final关键字"><a href="#7-6-final关键字" class="headerlink" title="7.6 final关键字"></a>7.6 final关键字</h2><blockquote>
+<p>final关键字的含义归根结底就是一句话：“<strong>这是无法改变的</strong>”。</p>
+</blockquote>
+<p>final可用于一下三种情况：</p>
+<ul>
+<li>数据</li>
+<li>方法</li>
+<li>类</li>
+</ul>
+<h3 id="7-6-1-final数据"><a href="#7-6-1-final数据" class="headerlink" title="7.6.1 final数据"></a>7.6.1 final数据</h3><p>很多时候我们需要使一些数据保持恒定不变，这类数据包括：</p>
+<ol>
+<li>一个永不改变的<strong>编译时常量</strong></li>
+<li>一个<strong>在运行时被初始化并且在此之后不会改变的值</strong></li>
+</ol>
+<p>我们用final来修饰以上两种数据来保持它们恒定不变，其中，对于编译时常量，编译器可以在编译时将该常量值代入任何需要它的地方执行计算公式，减轻了一些运行时的负担，<strong>在java中，编译时常量必须是基本数据类型</strong>，尽管经常看到诸如<code>pubic static final String VAR = &quot;var&quot;</code>这样的代码，但是，这个<code>VAR</code>并不是一个编译时常量，也许很多人碰到这样的面试题都会做错。</p>
+<p>当final用于对象引用而不是基本类型时，表示的是<strong>对象的引用恒定不变</strong>，对象一旦被初始化后，虽然对象自身可以随意修改，但是这个对象的引用无法再指向另一个对象。</p>
+<p><em>注意：</em>以上关于final用于对象引用的情况同时也使用于<code>数组</code>，因为数组也是对象。</p>
+<p>下面是一个例子帮助理解记忆：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeijingAccount</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 北京邮政区码,编译期常量，恒定改变</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> POST_EREA_CODE = <span class="number">1000000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> City city = <span class="keyword">new</span> Bejing();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假定以上代码表示在北京落户的户口，北京的邮政区码是个编译期常量不会改变，北京户口的城市当然肯定是北京，<code>city</code>这个引用对象可以在定义的时候初始化，也可以在构造器中初始化（空白final：很多情况下对象类型的常量都是在构造器中初始化），初始化之后，你可以随意改变对象“北京”的属性，你可以修改它的人口数，你可以重新任命一个北京市长，你甚至可以把北京改名叫西京，但是不管怎么改，<code>city</code>这个引用永远都是指向它而不能再指向别的城市。</p>
+<h3 id="7-6-2-引申：编译时常量和运行时常量"><a href="#7-6-2-引申：编译时常量和运行时常量" class="headerlink" title="7.6.2 引申：编译时常量和运行时常量"></a>7.6.2 引申：编译时常量和运行时常量</h3><p>一个例子说明问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Constant</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"class has been loaded..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> A = <span class="number">47</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> B = <span class="string">"HelloWorld"</span>.length();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstantDiff</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(Constant.A);</span><br><span class="line">        System.out.println(Constant.B);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">47</span><br><span class="line">class has been loaded...</span><br><span class="line">10</span><br></pre></td></tr></table></figure>
+<p>结论：</p>
+<ol>
+<li><code>A</code>被作为编译期全局常量，并不依赖于类，而<code>B</code>作为运行期的全局常量，其值还是依赖于类的（因为第2点）。</li>
+<li>编译时常量在编译时就可以确定值，如上例中的<code>A</code>可以确定值，但是<code>B</code>在编译器是不可能确定值的。</li>
+<li>由于编译时常量不依赖于类，所以对编译时常量的访问不会引发类的初始化。</li>
+<li>静态块的执行在运行时常量之前，在编译时常量之后。</li>
+</ol>
+<p>因此可以说：编译时常量同时也是运行时常量。</p>
+<h3 id="7-6-3-final方法"><a href="#7-6-3-final方法" class="headerlink" title="7.6.3 final方法"></a>7.6.3 final方法</h3><blockquote>
+<p>出于设计的考虑：想要确保在继承中使方法行为保持不变且不会被覆盖，就必须把方法锁定，防止任何继承类修改它的含义。</p>
+</blockquote>
+<p>在使用继承时，如果想明确禁止子类重写父类的某个方法，就将此方法设置为final的。就像老和尚不管小和尚怎么念经打坐，但是红烧肉必须按照老和尚的口味来做。</p>
+<h4 id="7-6-4-final和private关键字"><a href="#7-6-4-final和private关键字" class="headerlink" title="7.6.4 final和private关键字"></a>7.6.4 final和private关键字</h4><p>所有类中的<code>private</code>方法都隐式地指定为<code>final</code>的，所以对private方法添加final修饰符没有任何意义。由于无法取用private方法，所以子类不能覆盖它，如果我们恰好在子类中声明了与父类中一个private方法同名的方法，并不代表我们重写了这个private方法，这就像我们不能根据返回值来判断重载一样，它们只代表在子类中新建了一个方法而已。</p>
+<p>so，根据访问控制权限也不能作为判断是否重载或重写的标识了。</p>
+<h3 id="7-6-5-final类"><a href="#7-6-5-final类" class="headerlink" title="7.6.5 final类"></a>7.6.5 final类</h3><blockquote>
+<p>俗话说：够改不了吃屎。狗这个特性永远都不会改变，它吃屎的同时还不允许有什么别的动物跟着它学会吃屎。java中正好有这样一种类，这种类的设计永远不需要做任何变动，同时也不允许别的类继承它，这种类就是final类。</p>
+</blockquote>
+<p>从final类的定义可以看出：由于final类禁止继承，所以final类中所有的方法都隐式地指定为是final的，所以在final类中给方法添加final修饰词也然并卵。</p>
+<h2 id="7-7-初始化及类的加载"><a href="#7-7-初始化及类的加载" class="headerlink" title="7.7 初始化及类的加载"></a>7.7 初始化及类的加载</h2><blockquote>
+<p>也许在某一次面试时，面试官会问你：“在java中，访问类中一个static域时，这个类被加载了吗？”，你会怎么回答。</p>
+</blockquote>
+<p>java中的加载机制是这样的：每个类的编译代码都存在于它自己独立的文件中（class文件），该文件只在需要使用程序代码时才会被加载。一般来说：“<strong>类的代码在初次使用时才被加载</strong>”，也就是指加载发生在创建类的第一个对象的时候。</p>
+<p>但是，当访问<code>static对象域</code>时（对象域，不是编译时常量，编译时常量在编译时已经确定了值可以不加载类直接使用），也会发生加载，因为：“构造器也是static方法，尽管static关键字没有显式地写出来。因此更准确地讲，类在其任何static成员被访问时会被加载”。上面有关编译时常量和运行时常量的例子中去掉“A”和“B”前面的final修饰符运行程序输出的信息就能够证明这一点。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="Code Porter 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Code Porter
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://balderdasher.github.io/2017/05/15/thinking-in-java-reuse-class/" title="《Java编程思想》第7章-复用类">https://balderdasher.github.io/2017/05/15/thinking-in-java-reuse-class/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          
+            <a href="/tags/读书笔记/" rel="tag"><i class="fa fa-tag"></i> 读书笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/15/thinking-in-java-access-privilege/" rel="next" title="《Java编程思想》第6章-访问控制权限">
+                <i class="fa fa-chevron-left"></i> 《Java编程思想》第6章-访问控制权限
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/17/thinking-in-java-polymorphism/" rel="prev" title="《Java编程思想》第8章-多态">
+                《Java编程思想》第8章-多态 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMjQ2OS85MDMw"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/codeporter.jpg" alt="Code Porter">
+            
+              <p class="site-author-name" itemprop="name">Code Porter</p>
+              <p class="site-description motion-element" itemprop="description">男猿，北蛰</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/balderdasher" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:balderdasher@msn.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-组合语法"><span class="nav-number">1.</span> <span class="nav-text">7.1 组合语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-1-引用的初始化"><span class="nav-number">1.1.</span> <span class="nav-text">7.1.1 引用的初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-2-继承语法"><span class="nav-number">2.</span> <span class="nav-text">7.2 继承语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-1-初始化基类"><span class="nav-number">2.1.</span> <span class="nav-text">7.2.1 初始化基类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-3-代理"><span class="nav-number">3.</span> <span class="nav-text">7.3 代理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用JetBrains-Idea-IDE生成代理对象的代理方法代码"><span class="nav-number">3.1.</span> <span class="nav-text">使用JetBrains Idea IDE生成代理对象的代理方法代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-4-结合使用组合和继承"><span class="nav-number">4.</span> <span class="nav-text">7.4 结合使用组合和继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-1-确保正确清理"><span class="nav-number">4.1.</span> <span class="nav-text">7.4.1 确保正确清理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-5-向上转型"><span class="nav-number">5.</span> <span class="nav-text">7.5 向上转型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-5-1-慎用继承"><span class="nav-number">5.1.</span> <span class="nav-text">7.5.1 慎用继承</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-6-final关键字"><span class="nav-number">6.</span> <span class="nav-text">7.6 final关键字</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-6-1-final数据"><span class="nav-number">6.1.</span> <span class="nav-text">7.6.1 final数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-6-2-引申：编译时常量和运行时常量"><span class="nav-number">6.2.</span> <span class="nav-text">7.6.2 引申：编译时常量和运行时常量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-6-3-final方法"><span class="nav-number">6.3.</span> <span class="nav-text">7.6.3 final方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#7-6-4-final和private关键字"><span class="nav-number">6.3.1.</span> <span class="nav-text">7.6.4 final和private关键字</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-6-5-final类"><span class="nav-number">6.4.</span> <span class="nav-text">7.6.5 final类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-7-初始化及类的加载"><span class="nav-number">7.</span> <span class="nav-text">7.7 初始化及类的加载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Code Porter</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">67.9k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.3</div>
+
+
+
+<script>
+    var oldTitle = document.title;
+    document.addEventListener("visibilitychange", function () {
+        var isHidden = document.hidden;
+        if (isHidden) {
+            document.title = "爱我~别走〒_〒";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 3000);
+
+        } else {
+            document.title = "终于等到你~还好我没放弃.";
+            setTimeout(function () {
+                document.title = oldTitle;
+            }, 2000);
+        }
+    })
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
